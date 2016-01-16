@@ -1,5 +1,6 @@
 /*
-* C++ Program to Implement Traveling Salesman Problem using Nearest neighbour Algorithm
+* C++ Program to Implement Traveling Salesman Problem using
+ Nearest neighbour Algorithm
  */
 #include<stdio.h>
 #include<conio.h>
@@ -9,6 +10,14 @@
 #include<cstdlib>
 
 using namespace std;
+
+bool testGraph(void);
+bool testNode(void);
+bool testArc(void);
+/*-------------------------------------------------------------
+							CLASSES
+-------------------------------------------------------------*/
+
 
 class Arc{
 public:
@@ -57,6 +66,82 @@ public:
 	void addArc(Arc* a){ arcs.push_back(*a); }
 };
 
+/*-------------------------------------------------------------
+							FUNCTIONS
+-------------------------------------------------------------*/
+
+Graph* fillGraph(int n, int* tab, int* w){
+	// n - wymiar macierzy, gdzie
+	// tab [n][n]
+	// w   [n][3]
+	int i;
+	Graph* g = new Graph();
+	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
+	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
+	for(i = 0; i < n; ++i){
+		g->addNode(new Node(i));
+		for(int j=0; j<n; ++j)
+			if(i == j) continue;
+			else g->addArc(new Arc(i, j, tab[i*n + j]));
+	}
+	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
+	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
+
+	return g;
+}
+
+void printTab(int n, int* t){
+	int i, j;
+	for(i = 0; i < n; ++i){
+		cout<<"[";
+		for(j = 0; j < n - 1; ++j) cout<<t[i + j*n]<<", ";
+		cout<<t[i + j*n]<<"]\n";
+	}
+}
+
+/*-------------------------------------------------------------
+							MAIN
+-------------------------------------------------------------*/
+
+int main(){
+	srand(time(0));
+	//parametry
+	// godziny pracy, 0 to pierwsza minuta pracy
+	int STARTING_HOUR = 7;
+	int STARTING_MIN = 0;
+	int ENDING_HOUR = 20;
+	int ENDING_MIN = 0;
+	int MAX_WORKING_HOURS = 10;
+	// GRAF
+	int n = 7; // liczba wierzchołków
+	int windows[7][3] ={{60*0, 60*MAX_WORKING_HOURS, 0},
+						{60*1, 60*3, 10},
+						{60*0, 60*2, 20},
+						{60*4, 60*6, 15},
+						{60*2, 60*3, 0},
+						{60*2, 60*5, 7},
+						{60*3, 60*4, 4}}; // [start, koniec, czas obsługi]
+	int t[7][7];
+	for (int i = 0; i < 7; ++i){
+		for (int j = 0; j < 7; ++j){
+			if (i == j){
+				t[i][j] = 0;
+			} else {
+				if (j<i) t[i][j] = t[j][i];
+				else t[i][j] = rand()%100+1;
+			}
+		}
+	}
+	printTab(n, &t[0][0]);
+	Graph* g = fillGraph(n, &t[0][0], &windows[0][0]);
+
+	cout<<"Test Arc "<<testArc()<<endl
+		<<"Test Node "<<testNode()<<endl
+		<<"Test Graph "<<testGraph()<<endl;
+
+	return 0;
+}
+
 /*
 	Testy klas
 */
@@ -103,76 +188,4 @@ bool testGraph(void){
 	g->addArc(newArc);
 	if (g->arcs.size() != 3) result2 = false;
 	return result && result2;
-}
-
-Graph* fillGraph(int n, int* tab, int* w){
-	// n - wymiar macierzy, gdzie
-	// tab [n][n]
-	// w   [n][3]
-	int i;
-	Graph* g = new Graph();
-	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
-	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
-	for(i = 0; i < n; ++i){
-		g->addNode(new Node(i));
-		for(int j=0; j<n; ++j)
-			if(i == j) continue;
-			else g->addArc(new Arc(i, j, tab[i*n + j]));
-	}
-	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
-	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
-
-	return g;
-}
-
-void printTab(int n, int* t){
-	int i, j;
-	for(i = 0; i < n; ++i){
-		cout<<"[";
-		for(j = 0; j < n - 1; ++j) cout<<t[i + j*n]<<", ";
-		cout<<t[i + j*n]<<"]\n";
-	}
-}
-
-/*
-	main
-*/
-
-int main(){
-	srand(time(0));
-	//parametry
-	// godziny pracy, 0 to pierwsza minuta pracy
-	int STARTING_HOUR = 7;
-	int STARTING_MIN = 0;
-	int ENDING_HOUR = 20;
-	int ENDING_MIN = 0;
-	int MAX_WORKING_HOURS = 10;
-	// GRAF
-	int n = 7; // liczba wierzchołków
-	int windows[7][3] ={{60*0, 60*MAX_WORKING_HOURS, 0},
-						{60*1, 60*3, 10},
-						{60*0, 60*2, 20},
-						{60*4, 60*6, 15},
-						{60*2, 60*3, 0},
-						{60*2, 60*5, 7},
-						{60*3, 60*4, 4}}; // [start, koniec, czas obsługi]
-	int t[7][7];
-	for (int i = 0; i < 7; ++i){
-		for (int j = 0; j < 7; ++j){
-			if (i == j){
-				t[i][j] = 0;
-			} else {
-				if (j<i) t[i][j] = t[j][i];
-				else t[i][j] = rand()%100+1;
-			}
-		}
-	}
-	printTab(n, &t[0][0]);
-	Graph* g = fillGraph(n, &t[0][0], &windows[0][0]);
-
-	cout<<"Test Arc "<<testArc()<<endl
-		<<"Test Node "<<testNode()<<endl
-		<<"Test Graph "<<testGraph()<<endl;
-
-	return 0;
 }
