@@ -84,6 +84,11 @@ public:
 		while(!nodes.empty()) nodes.pop_back();
 		while(!arcs.empty()) arcs.pop_back();
 	}
+	void setNodeI(int i, int k, int newi){
+		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+			if(it->i == i && it->t == k)
+				it->i = newi;
+	}
 	void addNode(Node n){ nodes.push_back(n); }
 	void addNode(Node* n){ nodes.push_back(*n); }
 	void addNode(int a){ nodes.push_back(Node(a)); }
@@ -93,12 +98,19 @@ public:
 	void addArc(Arc a){ arcs.push_back(a); }
 	void addArc(Arc* a){ arcs.push_back(*a); }
 	void addArc(int i, int j, int cost = 0, int k = 0){ arcs.push_back(Arc(i, j, cost, k)); }
-	int searchNode(int i){
-		int node = 0;
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++node){
-			if(it->i == i) break;
+	void removeNode(int i, int t){
+		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+			if(it->i == i && it->t == t){
+				nodes.erase(it);
+				return;
+			}
+	}
+	int searchNode(int n){
+		int index = 0;
+		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++index){
+			if(it->i == n) break;
 		}
-		return node;
+		return index;
 	}
 	int searchArc(int a){
 		for (int i=0; i<arcs.size(); ++i)
@@ -228,7 +240,7 @@ Graph* firstGraph(int n, int* graph, int* windows){
 
 Graph* toSecondGraph(Graph* graph){
 	Graph* g = new Graph();
-	int n, i, j, p, k, l, cost, cntr;
+	int n, i, j, p, aj, cost;
 
 	// wierzchołki
 	n = graph->nodes.size();
@@ -249,9 +261,9 @@ Graph* toSecondGraph(Graph* graph){
 		for(vector<Node>::iterator vj = g->nodes.begin(); vj != g->nodes.end(); ++vj){
 			j = vj->i;
 			if(i != j){
-				aj = graph->nodes.at(graph->searchNode(j)).open
+				aj = graph->nodes.at(graph->searchNode(j)).open;
 				cost = graph->searchArcCost(i, j); // @TODO brak zmiennych czasów
-				if(vj->t == max(aj , vi->t + cost))
+				if(vj->t == max(aj, vi->t + cost))
 				{
 					//dodanie krawędzi @TODO brakuje kosztu czekania
 					g->addArc(i, j, cost, vi->t);
@@ -259,16 +271,35 @@ Graph* toSecondGraph(Graph* graph){
 			}
 		}
 	}
-	// cout<<cntr<<" counter "<<g->nodes.size()<<" g.size()\n";
-	// cout<<g->arcs.size()<<" AllArcs\n";
 
-	for(i=0; i<n; ++i){
-		p = g->countArcsByStart(i);
-		cout<<p<<" Arcs starting at "<<i<<endl;
+ 	// dodanie depo(-1)
+ 	g->addNode(-1);
+	
+	// dodawanie krawędzi z depo(-1) do 0 i odwrotnie
+	p = graph->nodes.at(graph->searchNode(0)).close -
+ 		graph->nodes.at(graph->searchNode(0)).open + 1;
+	for (i=0; i<p; ++i){
+		j=0;
+		for (vector<Arc>::iterator it = g->arcs.begin(); it != g->arcs.end(); ++it){
+			if(!j&1 && it->start == 0 && it->k == i){ // wychodzący
+				j = j|1;
+				g->addArc(-1, 0, 0, i);
+			}
+			if(!j&2 && it->end == 0 && it->k == i){ // wchodzący
+				j = j|2;
+				g->addArc(0, -1, 0, i);
+			}
+		}
+		if (j == 0) g->removeNode(0, i); // usunięcie 
 	}
-	// cout<<g->countArcsByStartK(0, 0)<<" Arcs from, 0 time 0\n";
-
 	return g;
+}
+
+void toThirdGraph(Graph* g){
+	for (vector<Node>::iterator it = g->nodes.begin(); it != g->nodes.end(); ++it){
+		if (it->i == 0) g->nodes.erase(it);
+	}
+
 }
 /*-------------------------------------------------------------
 							MAIN
