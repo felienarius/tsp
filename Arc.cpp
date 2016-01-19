@@ -1,23 +1,24 @@
 // Arc.cpp
 
-class Arc{
+class Arc {
 public:
-	int start;
-	int end;
-	int cost;
-	int k; // czas
-	Arc(){
-		start = 0;
-		end = 0;
-		cost = 0;
-		k = 0;
+	int start;	// wierzchołek początkowy
+	int end;	// wierzchołek końcowy
+	int dist;	// odległość
+	int t;		// czas przejazdu
+	int k;		// instancja czasu
+	Arc() {
+		start = end = dist = t = k = 0;
 	}
-	Arc(int a, int b, int c = 0, int ak = 0){
-		start = a;
-		end = b;
-		cost = c;
-		k = ak;
+	Arc(int i, int j, int d = 0, int tt = 0, int kk = 0) {
+		start = i;
+		end = j;
+		dist = d;
+		t = tt;
+		k = kk;
 	}
-	void print(void){ cout<<"A["<<start<<", "<<end<<"] "; }
-	void printAll(void){ cout<<"A["<<start<<", "<<end<<", "<<cost<<"] "; }
+	void print(void) {
+		cout << "A(" << start << ", " << end << ")["
+			<< dist << ", " << t << ", " << k << "]\t";
+	}
 };
