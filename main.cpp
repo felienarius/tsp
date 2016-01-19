@@ -1,203 +1,80 @@
-/*
-* C++ Program to Implement Traveling Salesman Problem using
- Nearest neighbour Algorithm
- */
 #include<stdio.h>
 #include<conio.h>
-#include<iostream>
-#include<vector>
 #include<ctime>
 #include<cstdlib>
+#include "Graph.cpp"
 
 using namespace std;
 
-bool testGraph(void);
-bool testNode(void);
-bool testArc(void);
-/*-------------------------------------------------------------
-							CLASSES
--------------------------------------------------------------*/
-class Arc{
-public:
-	int start;
-	int end;
-	int cost;
-	int k; // czas
-	Arc(){
-		start = 0;
-		end = 0;
-		cost = 0;
-		k = 0;
-	}
-	Arc(int a, int b, int c = 0, int ak = 0){
-		start = a;
-		end = b;
-		cost = c;
-		k = ak;
-	}
-	void print(void){ cout<<"A["<<start<<", "<<end<<"] "; }
-	void printAll(void){ cout<<"A["<<start<<", "<<end<<", "<<cost<<"] "; }
-};
+void printTab(int, int, int*);
+void printTab(int, int*);
+Graph* firstGraph(int, int*, int*);
+Graph* toSecondGraph(Graph*);
+Graph* toSecondGraph(int, int*, int*, int);
+void toThirdGraph(Graph*);
 
-class Node{
-public:
-	int i;
-	int open;
-	int close;
-	int service;
-	int t;
-	vector<int> outputs;
-	Node(){
-		i = open = close = service = t = 0;
-	}
-	Node(int a){
- 		i = a;
-		open = close = service = t = 0; }
-	// Node(int a, int b){ Node(a, 0, 0, 0); t = b; }
-	Node(int a, int b, int c, int d = 0, int ntime = 0){
-		i = a;
-		open = b;
-		close = c;
-		service = d;
-		t = ntime;
-	}
-	Node(int a, int tt){
- 		i = a;
- 		t = tt;
-		open = close = service = 0;
-	}
-	~Node(){
-		while(!outputs.empty()) outputs.pop_back();
-	}
-	// void setTime(int nt){ t = nt; }
-	void addOutput(int a){ outputs.push_back(a); }
-	void print(){ cout<<"N("<<i<<") ["<<open<<", "<<close<<", "<<service<<"]"<<endl; }
-	void printT(){ cout<<"N("<<i<<") ["<<t<<"]"<<endl; }
-};
 
-class Graph{
-public:
-	int n;
-	vector<Node> nodes;
-	vector<Arc> arcs;
-	Graph(int nn = 0){ n = nn; };
-	~Graph(){
-		while(!nodes.empty()) nodes.pop_back();
-		while(!arcs.empty()) arcs.pop_back();
-	}
-	void setNodeI(int i, int k, int newi){
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-			if(it->i == i && it->t == k)
-				it->i = newi;
-	}
-	void addNode(Node n){ nodes.push_back(n); }
-	void addNode(Node* n){ nodes.push_back(*n); }
-	void addNode(int a){ nodes.push_back(Node(a)); }
-	void addNode(int a, int b , int c){ nodes.push_back(Node(a, b, c)); }
-	void addNode(int a, int b, int c, int d = 0, int e = 0){ nodes.push_back(Node(a, b, c, d)); }
-	void addNode(int a, int b){ nodes.push_back(Node(a, b)); }
-	void addArc(Arc a){ arcs.push_back(a); }
-	void addArc(Arc* a){ arcs.push_back(*a); }
-	void addArc(int i, int j, int cost = 0, int k = 0){ arcs.push_back(Arc(i, j, cost, k)); }
-	void removeNode(int i, int t){
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-			if(it->i == i && it->t == t){
-				nodes.erase(it);
-				return;
-			}
-	}
-	void removeArcsOfNode(int i, int k){
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
-			if (it->start == i  &&  it->k == k) arcs.erase(it);
-			if (it->end == i  &&  (it->cost + it->start == k)) arcs.erase(it);
-		}
-	}
-	int searchNode(int n){
-		int index = 0;
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++index){
-			if(it->i == n) break;
-		}
-		return index;
-	}
-	int searchArc(int a){
-		for (int i=0; i<arcs.size(); ++i)
-			if (arcs[i].start == a)
-				return i;
-		return arcs.size();
-	}
-	int countArcsByStart(int start){
-		int sum = 0;
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it)
-			if(it->start == start)
-				++sum;
-		return sum;
-	}
-	int countArcsByStartK(int start, int k){
-		int sum = 0;
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it)
-			if(it->start == start)
-				if(it->k == k)
-					++sum;
-		return sum;
-	}
-	int searchArcCost(int a, int b){
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it)
-			if (it->start == a)
-				if (it->end == b)
-					return it->cost;
-		return arcs.size();
-	}
-	int searchNextArc(int a){
-		int s = arcs[a].start;
-		for(int i=++a; i<arcs.size(); ++i)
-				if(arcs[i].start == s)
-					return i;
-		return arcs.size();	
-	}
-	void print(){
-		int i, a;
-		
-		cout<<"\tNodes("<<nodes.size()<<"):"<<endl;
-		for(i=0; i<nodes.size(); ++i) nodes[i].print();
-		
-		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
-		for(i=0; i<nodes.size(); ++i){
-			a = searchArc(i);
-			while(a < arcs.size()){
-				arcs[a].print();
-				a = searchNextArc(a);
-			}
-			cout<<endl;
-		}
-	}
-	void printT(){
-		int i, a;
+int main() {
+	// srand(time(0));
+	//parametry
+	// godziny pracy, 0 to pierwsza minuta pracy
+	int STARTING_HOUR = 7;
+	int STARTING_MIN = 0;
+	int ENDING_HOUR = 20;
+	int ENDING_MIN = 0;
+	int MAX_WORKING_HOURS = 10;
+	// GRAF
+	int n = 6; // liczba wierzchołków
+	int graf[6][6]={{0, 7, 2, 11, 9, 6},
+					{7, 0, 15, 5, 8, 10},
+					{2, 15, 0, 4, 6, 3},
+					{11, 5, 4, 0, 3, 7},
+					{9, 8, 6, 3, 0, 7},
+					{6, 10, 3, 7, 7, 0}};
+	int okna[6][3]={{0, 40, 0},
+					{12, 30, 0},
+					{4, 9, 0},
+					{14, 26, 0},
+					{5, 20, 0},
+					{1, 13, 0}};
 
-		cout<<"\tNodes("<<nodes.size()<<"):"<<endl;
-		for (i=0; i<nodes.size(); ++i) nodes[i].printT();
-		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
+	int n2 = 4;
+	int graf2[5][4][4]={
+	{{0, 2, 1, 3},
+	{1, 0, 1, 2},
+	{1, 1, 0, 2},
+	{1, 0, 0, 0}},
+	{{0, 1, 1, 2},
+	{1, 0, 0, 1},
+	{1, 1, 0, 1},
+	{1, 0, 0, 0}},
+	{{0, 1, 0, 2},
+	{1, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}},
+	{{0, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}},
+	{{0, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}}};
+	int okna2[4][3] = {{1, 7, 0}, {2, 4, 0}, {2, 3, 0}, {4, 6, 0}};
 
-		for (i = 0; i < nodes.size(); ++i){
-			a = searchArc(i);
-			while (a < arcs.size()){
-				arcs[a].print();
-				a = searchNextArc(a);
-			}
-			cout<<endl;
-		}
-	}
-	int countNodes(int n){
-		int sum = 0;
-		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-			if (it->i == n)
-				++sum;
-		return sum;
-	}
-};
+	Graph* g;
+	Graph* g2;
+	// g = firstGraph(n, graf[0], okna[0]);
+	g = toSecondGraph(n2, &graf2[0][0][0], &okna2[0][0], 5);
+	g->print();
+	
+	// g2 = toSecondGraph(g);
+	// g2->printT();
+	// delete g2;
+	delete g;
 
-/*-------------------------------------------------------------
-							FUNCTIONS
--------------------------------------------------------------*/
+	return 0;
+}
 
 Graph* fillGraph(int n, int* tab, int* w){
 	// n - wymiar macierzy, gdzie
@@ -208,10 +85,10 @@ Graph* fillGraph(int n, int* tab, int* w){
 	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
 	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
 	for(i = 0; i < n; ++i){
-		g->addNode(new Node(i));
+		g->addNode(i);
 		for(int j=0; j<n; ++j)
 			if(i == j) continue;
-			else g->addArc(new Arc(i, j, tab[i*n + j]));
+			else g->addArc(i, j, tab[i*n + j]);
 	}
 	cout<<"g.nodes size = "<<g->nodes.size()<<endl;
 	cout<<"g.arcs size = "<<g->arcs.size()<<endl;
@@ -364,116 +241,4 @@ void toThirdGraph(Graph* g){
 			}
 		}
 	}
-}
-/*-------------------------------------------------------------
-							MAIN
--------------------------------------------------------------*/
-
-int main(){
-	srand(time(0));
-	//parametry
-	// godziny pracy, 0 to pierwsza minuta pracy
-	int STARTING_HOUR = 7;
-	int STARTING_MIN = 0;
-	int ENDING_HOUR = 20;
-	int ENDING_MIN = 0;
-	int MAX_WORKING_HOURS = 10;
-	// GRAF
-	int n = 6; // liczba wierzchołków
-	int graf[6][6]={{0, 7, 2, 11, 9, 6},
-					{7, 0, 15, 5, 8, 10},
-					{2, 15, 0, 4, 6, 3},
-					{11, 5, 4, 0, 3, 7},
-					{9, 8, 6, 3, 0, 7},
-					{6, 10, 3, 7, 7, 0}};
-	int okna[6][3]={{0, 40, 0},
-					{12, 30, 0},
-					{4, 9, 0},
-					{14, 26, 0},
-					{5, 20, 0},
-					{1, 13, 0}};
-
-	int n2 = 4;
-	int graf2[5][4][4]={
-	{{0, 2, 1, 3},
-	{1, 0, 1, 2},
-	{1, 1, 0, 2},
-	{1, 0, 0, 0}},
-	{{0, 1, 1, 2},
-	{1, 0, 0, 1},
-	{1, 1, 0, 1},
-	{1, 0, 0, 0}},
-	{{0, 1, 0, 2},
-	{1, 0, 0, 1},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0}},
-	{{0, 0, 0, 1},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0}},
-	{{0, 0, 0, 1},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0},
-	{0, 0, 0, 0}}};
-	int okna2[4][3] = {{1, 7, 0}, {2, 4, 0}, {2, 3, 0}, {4, 6, 0}};
-
-	Graph* g;
-	Graph* g2;
-	// g = firstGraph(n, graf[0], okna[0]);
-	g = toSecondGraph(n2, graf2[0][0], okna2[0], 5);
-	g->print();
-	
-	// g2 = toSecondGraph(g);
-	// g2->printT();
-	// delete g2;
-	delete g;
-
-	return 0;
-}
-/*-------------------------------------------------------------
-						TESTY KLAS
--------------------------------------------------------------*/
-bool testArc(void){
-	Arc* a = new Arc();
-	Arc* b = new Arc(1,5);
-	bool result = false;
-
-	if (a->start == 0 && a->end == 0 && b->start == 1 && b->end == 5)
-		result = true;
-	return result;
-}
-
-bool testNode(void){
-	Node* a = new Node();
-	Node* b = new Node(2);
-	bool result = false;
-
-	if (a->i == 0 && b->i == 2)
-		result = true;
-	return result;
-}
-
-bool testGraph(void){
-	Graph* g = new Graph();
-	Node* newNode = new Node(5);
-	Node n(78);
-	Arc* newArc = new Arc(5,8);
-	Arc a(1,2);
-	bool result, result2;
-
-	result = result2 = true;
-	g->addNode(n);
-	if (g->nodes.size() != 1) result = false;
-	g->addNode(*newNode);
-	if (g->nodes.size() != 2) result = false;
-	g->addNode(newNode);
-	if (g->nodes.size() != 3) result = false;
-
-	g->addArc(a);
-	if (g->arcs.size() != 1) result2 = false;
-	g->addArc(newArc);
-	if (g->arcs.size() != 2) result2 = false;
-	g->addArc(newArc);
-	if (g->arcs.size() != 3) result2 = false;
-	return result && result2;
 }
