@@ -22,7 +22,7 @@ public:
 	int getN() { return n; }
 	int getNodeOpen(int i, int k = 0) {
 		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-			if (it->i == i && it->t == k) {
+			if (it->i == i && it->k == k) {
 				return it->open;
 			}
 		}
@@ -30,37 +30,11 @@ public:
 	}
 	int getNodeClose(int i, int k = 0) {
 		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-			if (it->i == i && it->t == k) {
+			if (it->i == i && it->k == k) {
 				return it->close;
 			}
 		}
 		return -1;
-	}
-
-	void addNode(int i) {
-		Node* node = new Node(i);
-		nodes.push_back(*node);
-	}
-	void addArc(int i, int j, int dist, int travel = 0, int k = 0) {
-		Arc* arc = new Arc(i, j, dist, travel, k);
-		arcs.push_back(*arc);
-	}
-
-	void connectNodes(Graph* graph) {
-		int i, j, travel;
-		for (vector<Node>::iterator vi = nodes.begin(); vi != nodes.end(); ++vi) {
-			i = vi->i;
-			for (vector<Node>::iterator vj = nodes.begin(); vj != nodes.end(); ++vj) {
-				j = vj->i;
-				if (i != j) {
-					travel = graph->getArcTravelTime(i, j);
-					if(vj->t == max(graph->getNodeOpen(j), vi->t + travel)) {
-						// @TODO nodes in/outputs missing
-						addArc(i, j, graph->getArcDist(i, j), travel, vi->t);
-					}
-				}
-			}
-		}
 	}
 
 	/* get distance between Node i and Node j (in that order) */
@@ -81,6 +55,38 @@ public:
 		return 0;
 	}
 
+	void addNode(int i, int k = 0) {
+		Node* node = new Node(i, k);
+		nodes.push_back(*node);
+	}
+	void addArc(int i, int j, int dist, int travel = 0, int k = 0) {
+		Arc* arc = new Arc(i, j, dist, travel, k);
+		arcs.push_back(*arc);
+	}
+
+	void removeNode(int i, int k) {
+		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+			if (it->i == i && it->k == k) {
+				removeArcsOfNode(i, k);
+				nodes.erase(it);
+				break;
+			}
+	}
+
+	// @TODO remove links to other nodes than removing one
+	void removeArcsOfNode(int i, int k) {
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+			if (it->start == i  &&  it->k == k) arcs.erase(it);
+			if (it->end == i  &&  (it->t + it->start == k)) arcs.erase(it);
+		}
+	}
+	void removeArcsOfNode(int i) {
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+			if (it->start == i) arcs.erase(it);
+			if (it->end == i) arcs.erase(it);
+		}
+	}
+
 	void setTimeWindow(int i, int open, int close, int service) {
 		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
 			if (it->i == i){
@@ -93,10 +99,123 @@ public:
 	}
 
 	void setArcTravelTime(int i, int j, int t) {
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
 			if (it->start == i  &&  it->end == j){
 				it->t = t;
 				return;
+			}
+		}
+	}
+
+
+	/* adds Node with all possible time instances */
+	void crossNodes(Graph* graph) {
+		int i, j, p;
+		for (i = 0; i < n; ++i) {
+			j = graph->getNodeOpen(i);
+			p = graph->getNodeClose(i) + 1;
+			for (; j < p; ++j) {
+				addNode(i, j);
+			}
+		}
+	}
+
+	/* connects nodes if its traveling time fits (can come earlier!) */
+	void connectNodes(Graph* graph) {
+		int i, j, travel;
+		for (vector<Node>::iterator vi = nodes.begin(); vi != nodes.end(); ++vi) {
+			i = vi->i;
+			for (vector<Node>::iterator vj = nodes.begin(); vj != nodes.end(); ++vj) {
+				j = vj->i;
+				if (i != j) {
+					travel = graph->getArcTravelTime(i, j);
+					if(vj->k == max(graph->getNodeOpen(j), vi->k + travel)) {
+						// @TODO nodes in/outputs missing
+						addArc(i, j, graph->getArcDist(i, j), travel, vi->k);
+					}
+				}
+			}
+		}
+	}
+
+	/* Adds Depot = Node(-1) to graph, and link it with other nodes */
+	void connectDepot(Graph* graph) {
+		int i, j, p0;
+		i = graph->getNodeOpen(0);
+		p0 = graph->getNodeClose(0) - i + 1;
+		// k = {0, ... , p0}
+		addNode(-1);
+		for (i = 0; i < p0 ; ++i) {
+			j = 0;
+			for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+				if(!(j & 1) && (it->start == 0) && (it->k == i)) { // wychodzący
+					j = j|1;
+					addArc(-1, 0, 0, 0, i);
+				}
+				if(!(j & 2) && (it->end == 0) && (it->k == i)) { // wchodzący
+					j = j|2;
+					addArc(0, -1, 0, 0, i);
+				}
+			}
+			if (j == 0) removeNode(0, i); // usunięcie
+		}
+	}
+	
+	/* reduces near Depot nodes and arcs */
+	void convertToSecondAuxiliaryGraph(Graph* graph) {
+		int i, k, mint, dist, plus, minus, in, out;
+		vector<Node>::iterator nit;
+		vector<Arc>::iterator ait;
+
+		// removing nodes v0s' and v0e'
+		for (nit = nodes.begin(); nit != nodes.end(); ++nit)
+			if (nit->i == 0) {
+				nodes.erase(nit);
+			}
+		
+		// moving arcs from v0(0) to vd(-1) 
+		mint = -1;
+		k = -1;
+		for (i = 1; i < n; ++i) {
+			for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
+				if (ait->start == 0 && ait->end == i) {
+					if (ait->t < mint  ||  mint == -1) {
+						dist = ait->dist;
+						mint = ait->t;
+						k = ait->k;
+					}
+				}
+				if (ait->end == 0 && ait->start == i) addArc(i, -1, ait->dist, ait->t, ait->k);
+			}
+			addArc(-1, i, dist, mint, k);
+		}
+		// removing left arcs
+		removeArcsOfNode(0);
+
+		// redukcja zbędnych wierzchołków
+		for (nit = nodes.begin(); nit != nodes.end(); ++nit){
+			plus = minus = 0;
+			i = nit->i;
+			k = nit->k;
+			for (ait = arcs.begin(); ait != arcs.end(); ++ait){
+				if (ait->start == i  &&  ait->k == k){
+					++plus;
+					out = ait->end;
+				}
+				if (ait->end == i  &&  (ait->t + ait->k == k)){
+					++minus;
+					in = ait->start;
+				}
+			}
+			if (plus == 0 || minus == 0){
+				if (plus + minus > 0) removeArcsOfNode(i, k);
+				removeNode(i, k);
+			}
+			if (plus == 1 && minus == 1){
+				if(in == -1  && out == -1){
+					removeArcsOfNode(i, k);
+					removeNode(i, k);
+				}
 			}
 		}
 	}
@@ -131,39 +250,35 @@ public:
 
 
 
+
+
+
+
+
+
+
+
 	// void addNode(int a){ nodes.push_back(Node(a)); }
 	void addNode(int a, int b , int c){ nodes.push_back(Node(a, b, c)); }
 	void addNode(int a, int b, int c, int d = 0, int e = 0){ nodes.push_back(Node(a, b, c, d)); }
-	void addNode(int a, int b){ nodes.push_back(Node(a, b)); }
+	// void addNode(int a, int b){ nodes.push_back(Node(a, b)); }
 	
 	void setNodeI (int i, int k, int newi){
 		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-			if(it->i == i && it->t == k)
+			if(it->i == i && it->k == k)
 				it->i = newi;
 	}
 	
 	
 	
-	void removeNode(int i, int t){
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-			if(it->i == i && it->t == t){
-				nodes.erase(it);
-				return;
-			}
-	}
-	// void removeArcsOfNode(int i, int k){
-	// 	for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
-	// 		if (it->start == i  &&  it->k == k) arcs.erase(it);
-	// 		if (it->end == i  &&  (it->cost + it->start == k)) arcs.erase(it);
+
+	// int searchNode(int n){
+	// 	int index = 0;
+	// 	for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++index){
+	// 		if(it->i == n) break;
 	// 	}
+	// 	return index;
 	// }
-	int searchNode(int n){
-		int index = 0;
-		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++index){
-			if(it->i == n) break;
-		}
-		return index;
-	}
 	// int searchArc(int a){
 	// 	for (int i=0; i<arcs.size(); ++i)
 	// 		if (arcs[i].start == a)

@@ -19,6 +19,6 @@ public:
 	}
 	void print(void) {
 		cout << "A(" << start << ", " << end << ")["
-			<< dist << ", " << t << ", " << k << "]\t";
+			<< dist << ", " << t << ", " << k << "] \t";
 	}
 };

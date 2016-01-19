@@ -24,16 +24,19 @@ Graph* firstAuxiliaryGraph(Graph* g);
 
 
 int main() {
+	srand(5);
 	int n = 6; // liczba wierzchołków
 	Graph* dg = new Graph(n, 6);
 	Graph* tg;
 
-	generateTimeWindows(dg, 0, 40, 0);
+	generateTimeWindows(dg, 0, 41, 0);
 	generateDistances(dg, 20, 50);
 	generateTravelTimes(dg, 1, 12);
-	
 	dg->print();
+	// dg->print();
 	tg = firstAuxiliaryGraph(dg);
+	tg->print();
+	tg->convertToSecondAuxiliaryGraph(dg);
 	tg->print();
 
 	delete dg;
@@ -105,37 +108,14 @@ Graph* firstAuxiliaryGraph(Graph* graph){
 	g = new Graph(n);
 
 	// wierzchołki
-	for (i = 0; i < n; ++i){
-		j = graph->getNodeOpen(i);
-		p = graph->getNodeClose(i) + 1;
-		for(; j<p; ++j){
-			g->addNode(i, j);
-		}
-	}
+	g->crossNodes(graph);
+
 	// dodawanie krawędzi
 	g->connectNodes(graph);
-	
 
- // 	// dodanie depo(-1)
- // 	g->addNode(-1);
+	// dodanie depo(-1)
+	g->connectDepot(graph);
 	
-	// // dodawanie krawędzi z depo(-1) do 0 i odwrotnie
-	// p = graph->nodes.at(graph->searchNode(0)).close -
- // 		graph->nodes.at(graph->searchNode(0)).open + 1;
-	// for (i=0; i<p; ++i){
-	// 	j=0;
-	// 	for (vector<Arc>::iterator it = g->arcs.begin(); it != g->arcs.end(); ++it){
-	// 		if(!j&1 && it->start == 0 && it->k == i){ // wychodzący
-	// 			j = j|1;
-	// 			g->addArc(-1, 0, 0, i);
-	// 		}
-	// 		if(!j&2 && it->end == 0 && it->k == i){ // wchodzący
-	// 			j = j|2;
-	// 			g->addArc(0, -1, 0, i);
-	// 		}
-	// 	}
-	// 	if (j == 0) g->removeNode(0, i); // usunięcie 
-	// }
 	return g;
 }
 // Graph* firstGraph(int n, int* graph, int* windows){
@@ -198,57 +178,4 @@ void printTab(int n, int* t){ printTab(n,n,t); }
 // 		}
 // 	}
 // 	return g;
-// }
-
-// void toThirdGraph(Graph* g){
-// 	int i, k, min, plus, minus, in, out;
-// 	vector<Node>::iterator nit;
-// 	vector<Arc>::iterator ait;
-
-// 	for (nit = g->nodes.begin(); nit != g->nodes.end(); ++nit)
-// 		if (nit->i == 0) g->nodes.erase(nit);
-	
-// 	// przeniesienie krawędzi zamiast v0
-// 	min = -1;
-// 	k = 1;
-// 	for (i = 1; i < g->n; ++i){
-// 		for (ait = g->arcs.begin(); ait != g->arcs.end(); ++ait){
-// 			if (ait->start == -1 && ait->end == i){
-// 				if (min == -1) min = ait->cost;
-// 				if (ait->cost < min){
-// 					min = ait->cost;
-// 					k = ait->k;
-// 				}
-// 			}
-// 			if (ait->end == 0 && ait->start == i) g->addArc(i, -1, ait->cost, ait->k);
-// 		}
-// 		g->addArc(-1,i,min,k);
-// 	}
-
-// 	// redukcja zbędnych wierzchołków
-// 	for (nit = g->nodes.begin(); nit != g->nodes.end(); ++nit){
-// 		plus = minus = 0;
-// 		i = nit->i;
-// 		k = nit->t;
-// 		for (ait = g->arcs.begin(); ait != g->arcs.end(); ++ait){
-// 			if (ait->start == i  &&  ait->k == k){
-// 				++plus;
-// 				out = ait->end;
-// 			}
-// 			if (ait->end == i  &&  (ait->cost + ait->k == k)){
-// 				++minus;
-// 				in = ait->start;
-// 			}
-// 		}
-// 		if (plus == 0 || minus == 0){
-// 			if (plus + minus > 0) g->removeArcsOfNode(i, k);
-// 			g->removeNode(i, k);
-// 		}
-// 		if (plus == 1 && minus == 1){
-// 			if(in == -1  && out == -1){
-// 				g->removeArcsOfNode(i, k);
-// 				g->removeNode(i, k);
-// 			}
-// 		}
-// 	}
 // }
