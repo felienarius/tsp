@@ -32,12 +32,8 @@ int main() {
 	generateTimeWindows(dg, 0, 41, 0);
 	generateDistances(dg, 20, 50);
 	generateTravelTimes(dg, 1, 12);
-	dg->print();
-	// dg->print();
 	tg = firstAuxiliaryGraph(dg);
-	tg->print();
 	tg->convertToSecondAuxiliaryGraph(dg);
-	tg->print();
 
 	delete dg;
 	delete tg;

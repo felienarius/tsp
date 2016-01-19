@@ -142,9 +142,11 @@ public:
 	void connectDepot(Graph* graph) {
 		int i, j, p0;
 		i = graph->getNodeOpen(0);
-		p0 = graph->getNodeClose(0) - i + 1;
+		p0 = graph->getNodeClose(0); // - i + 1;
 		// k = {0, ... , p0}
 		addNode(-1);
+		setTimeWindow(-1, i, p0, 0);
+		p0 = p0 - i + 1;
 		for (i = 0; i < p0 ; ++i) {
 			j = 0;
 			for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
@@ -163,7 +165,7 @@ public:
 	
 	/* reduces near Depot nodes and arcs */
 	void convertToSecondAuxiliaryGraph(Graph* graph) {
-		int i, k, mint, dist, plus, minus, in, out;
+		int i, j, k, mint, dist, plus, minus, in, out;
 		vector<Node>::iterator nit;
 		vector<Arc>::iterator ait;
 
@@ -193,11 +195,12 @@ public:
 		removeArcsOfNode(0);
 
 		// redukcja zbędnych wierzchołków
-		for (nit = nodes.begin(); nit != nodes.end(); ++nit){
+		mint = getNodeOpen(-1);
+		for (nit = nodes.begin(); nit != nodes.end(); ++nit) {
 			plus = minus = 0;
 			i = nit->i;
 			k = nit->k;
-			for (ait = arcs.begin(); ait != arcs.end(); ++ait){
+			for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
 				if (ait->start == i  &&  ait->k == k){
 					++plus;
 					out = ait->end;
@@ -210,11 +213,19 @@ public:
 			if (plus == 0 || minus == 0){
 				if (plus + minus > 0) removeArcsOfNode(i, k);
 				removeNode(i, k);
-			}
-			if (plus == 1 && minus == 1){
-				if(in == -1  && out == -1){
+			} else if (plus == 1 && out == -1) {
+				if (minus == 1 && in == -1){
 					removeArcsOfNode(i, k);
 					removeNode(i, k);
+				} else
+				if (minus >= 1) {
+					for (j = 0; j < n; ++j) {
+						if (j == i) continue;
+						if (graph->getNodeOpen(j) >= nit->open + k - 1) {
+							removeArcsOfNode(i, k);
+							removeNode(i, k);
+						}
+					}
 				}
 			}
 		}
