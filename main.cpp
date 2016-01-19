@@ -77,9 +77,10 @@ public:
 
 class Graph{
 public:
+	int n;
 	vector<Node> nodes;
 	vector<Arc> arcs;
-	Graph(){};
+	Graph(int nn = 0){ n = nn; };
 	~Graph(){
 		while(!nodes.empty()) nodes.pop_back();
 		while(!arcs.empty()) arcs.pop_back();
@@ -225,7 +226,7 @@ void printTab(int n, int m, int* t){
 void printTab(int n, int* t){ printTab(n,n,t); }
 
 Graph* firstGraph(int n, int* graph, int* windows){
-	Graph* g = new Graph();
+	Graph* g = new Graph(n);
 	int i, j;
 
 	for(i=0; i<n; ++i){
@@ -239,7 +240,7 @@ Graph* firstGraph(int n, int* graph, int* windows){
 }
 
 Graph* toSecondGraph(Graph* graph){
-	Graph* g = new Graph();
+	Graph* g = new Graph(graph->n);
 	int n, i, j, p, aj, cost;
 
 	// wierzchołki
@@ -296,10 +297,44 @@ Graph* toSecondGraph(Graph* graph){
 }
 
 void toThirdGraph(Graph* g){
-	for (vector<Node>::iterator it = g->nodes.begin(); it != g->nodes.end(); ++it){
-		if (it->i == 0) g->nodes.erase(it);
+	int i, k, min, plus, minus;
+	vector<Node>::iterator nit;
+	vector<Arc>::iterator ait;
+
+	for (nit = g->nodes.begin(); nit != g->nodes.end(); ++nit)
+		if (nit->i == 0) g->nodes.erase(nit);
+	
+	// przeniesienie krawędzi zamiast v0
+	min = -1;
+	k = 1;
+	for (i = 1; i < g->n; ++i){
+		for (ait = g->arcs.begin(); ait != g->arcs.end(); ++ait){
+			if (ait->start == -1 && ait->end == i){
+				if (min == -1) min = ait->cost;
+				if (ait->cost < min){
+					min = ait->cost;
+					k = ait->k;
+				}
+			}
+			if (ait->end == 0 && ait->start == i) g->addArc(i, -1, ait->cost, ait->k);
+		}
+		g->addArc(-1,i,min,k);
 	}
 
+	// redukcja zbędnych wierzchołków
+	for (nit = g->nodes.begin(); nit != g->nodes.end(); ++nit){
+		plus = minus = 0;
+		i = nit->i;
+		k = nit->t;
+		for (ait = g->arcs.begin(); ait != g->arcs.end(); ++ait){
+			if(ait->start == i && ait->k == k) ++plus;
+			if(ait->end == i && (ait->cost + ait->k == k) ++minus;
+		}
+		if(plus == 0 || minus == 0){
+			
+		}
+	}
+	
 }
 /*-------------------------------------------------------------
 							MAIN
