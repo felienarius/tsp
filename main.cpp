@@ -106,6 +106,12 @@ public:
 				return;
 			}
 	}
+	void removeArcsOfNode(int i, int k){
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
+			if (it->start == i  &&  it->k == k) arcs.erase(it);
+			if (it->end == i  &&  (it->cost + it->start == k)) arcs.erase(it);
+		}
+	}
 	int searchNode(int n){
 		int index = 0;
 		for(vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it, ++index){
@@ -150,36 +156,34 @@ public:
 	}
 	void print(){
 		int i, a;
+		
 		cout<<"\tNodes("<<nodes.size()<<"):"<<endl;
 		for(i=0; i<nodes.size(); ++i) nodes[i].print();
+		
 		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
-
 		for(i=0; i<nodes.size(); ++i){
 			a = searchArc(i);
-			if (a != 0){
-				while(a < arcs.size()){
-					arcs[a].print();
-					a = searchNextArc(a);
-				}
-				cout<<endl;
+			while(a < arcs.size()){
+				arcs[a].print();
+				a = searchNextArc(a);
 			}
+			cout<<endl;
 		}
 	}
 	void printT(){
 		int i, a;
+
 		cout<<"\tNodes("<<nodes.size()<<"):"<<endl;
-		for(i=0; i<nodes.size(); ++i) nodes[i].printT();
+		for (i=0; i<nodes.size(); ++i) nodes[i].printT();
 		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
 
-		for(i=0; i<nodes.size(); ++i){
+		for (i = 0; i < nodes.size(); ++i){
 			a = searchArc(i);
-			if (a != 0){
-				while(a < arcs.size()){
-					arcs[a].print();
-					a = searchNextArc(a);
-				}
-				cout<<endl;
+			while (a < arcs.size()){
+				arcs[a].print();
+				a = searchNextArc(a);
 			}
+			cout<<endl;
 		}
 	}
 	int countNodes(int n){
@@ -295,9 +299,22 @@ Graph* toSecondGraph(Graph* graph){
 	}
 	return g;
 }
+Graph* toSecondGraph(int n, int* graph, int* windows, int t){
+	Graph* g = new Graph(n);
+	int i, j;
+
+	for(i=0; i<n; ++i){
+		g->addNode(i, windows[3*i], windows[3*i + 1], windows[3*i + 2]);
+		for(j=0; j<n; ++j){
+			if(i==j || graph[i*n + j] <= 0) continue;
+			g->addArc(i, j, graph[i*n + j]);
+		}
+	}
+	return g;
+}
 
 void toThirdGraph(Graph* g){
-	int i, k, min, plus, minus;
+	int i, k, min, plus, minus, in, out;
 	vector<Node>::iterator nit;
 	vector<Arc>::iterator ait;
 
@@ -327,14 +344,26 @@ void toThirdGraph(Graph* g){
 		i = nit->i;
 		k = nit->t;
 		for (ait = g->arcs.begin(); ait != g->arcs.end(); ++ait){
-			if(ait->start == i && ait->k == k) ++plus;
-			if(ait->end == i && (ait->cost + ait->k == k) ++minus;
+			if (ait->start == i  &&  ait->k == k){
+				++plus;
+				out = ait->end;
+			}
+			if (ait->end == i  &&  (ait->cost + ait->k == k)){
+				++minus;
+				in = ait->start;
+			}
 		}
-		if(plus == 0 || minus == 0){
-			
+		if (plus == 0 || minus == 0){
+			if (plus + minus > 0) g->removeArcsOfNode(i, k);
+			g->removeNode(i, k);
+		}
+		if (plus == 1 && minus == 1){
+			if(in == -1  && out == -1){
+				g->removeArcsOfNode(i, k);
+				g->removeNode(i, k);
+			}
 		}
 	}
-	
 }
 /*-------------------------------------------------------------
 							MAIN
@@ -363,15 +392,42 @@ int main(){
 					{14, 26, 0},
 					{5, 20, 0},
 					{1, 13, 0}};
+
+	int n2 = 4;
+	int graf2[5][4][4]={
+	{{0, 2, 1, 3},
+	{1, 0, 1, 2},
+	{1, 1, 0, 2},
+	{1, 0, 0, 0}},
+	{{0, 1, 1, 2},
+	{1, 0, 0, 1},
+	{1, 1, 0, 1},
+	{1, 0, 0, 0}},
+	{{0, 1, 0, 2},
+	{1, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}},
+	{{0, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}},
+	{{0, 0, 0, 1},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0},
+	{0, 0, 0, 0}}};
+	int okna2[4][3] = {{1, 7, 0}, {2, 4, 0}, {2, 3, 0}, {4, 6, 0}};
+
 	Graph* g;
 	Graph* g2;
-	g = firstGraph(n, graf[0], okna[0]);
-	// g->print();
-	g2 = toSecondGraph(g);
+	// g = firstGraph(n, graf[0], okna[0]);
+	g = toSecondGraph(n2, graf2[0][0], okna2[0], 5);
+	g->print();
+	
+	// g2 = toSecondGraph(g);
 	// g2->printT();
-
+	// delete g2;
 	delete g;
-	delete g2;
+
 	return 0;
 }
 /*-------------------------------------------------------------
