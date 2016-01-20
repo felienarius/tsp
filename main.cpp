@@ -2,29 +2,30 @@
 #include <conio.h>
 #include <ctime>
 #include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "Graph.cpp"
 
 using namespace std;
 
 int RANDOM = 0;
 
-/* nowe*/
+
 void generateDistances(Graph* g, int min, int max, int variation = 10);
 void generateTimeWindows(Graph* g, int open, int close, int maxService);
 void generateTravelTimes(Graph* g, int min, int max);
 Graph* firstAuxiliaryGraph(Graph* g);
-
-/*stare*/
-// void printTab(int, int, int*);
-// void printTab(int, int*);
-// Graph* firstGraph(int, int*, int*);
-// Graph* toSecondGraph(Graph*);
-// Graph* toSecondGraph(int, int*, int*, int);
-// void toThirdGraph(Graph*);
+int loadATSP(char* name, int* dist);
 
 
 int main() {
 	srand(5);
+	int n4 = 4;
+	int* dist;
+	int* windows;
+	int* t;
+	int* f;
 	int n = 6; // liczba wierzchołków
 	Graph* dg = new Graph(n, 6);
 	Graph* tg;
@@ -103,17 +104,33 @@ Graph* firstAuxiliaryGraph(Graph* graph){
 	n = graph->getN();
 	g = new Graph(n);
 
-	// wierzchołki
+	// vertexes
 	g->crossNodes(graph);
 
-	// dodawanie krawędzi
+	// adding arcs
 	g->connectNodes(graph);
 
-	// dodanie depo(-1)
+	// adding Depot(-1)
 	g->connectDepot(graph);
 	
 	return g;
 }
+
+int loadATSP(char* name, int* dist) {
+	string line;
+	ifstream myfile ("atsp/" + name);
+	if (myfile.is_open()) {
+		while ( getline (myfile, line) ) {
+			cout << line << '\n';
+		}
+		myfile.close();
+	}
+
+	else cout << "Unable to open file";
+
+	return 0;
+}
+
 // Graph* firstGraph(int n, int* graph, int* windows){
 // 	Graph* g = new Graph(n);
 // 	int i, j;
@@ -148,15 +165,15 @@ Graph* firstAuxiliaryGraph(Graph* graph){
 // 	return g;
 // }
 
-void printTab(int n, int m, int* t){
-	int i, j;
-	for(i = 0; i < n; ++i){
-		cout<<"[";
-		for(j = 0; j < m - 1; ++j) cout<<t[i + j*n]<<", ";
-		cout<<t[i + j*n]<<"]\n";
-	}
-}
-void printTab(int n, int* t){ printTab(n,n,t); }
+// void printTab(int n, int m, int* t){
+// 	int i, j;
+// 	for(i = 0; i < n; ++i){
+// 		cout<<"[";
+// 		for(j = 0; j < m - 1; ++j) cout<<t[i + j*n]<<", ";
+// 		cout<<t[i + j*n]<<"]\n";
+// 	}
+// }
+// void printTab(int n, int* t){ printTab(n,n,t); }
 
 
 
