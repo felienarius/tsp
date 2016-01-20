@@ -12,32 +12,53 @@ using namespace std;
 int RANDOM = 0;
 
 
-void generateDistances(Graph* g, int min, int max, int variation = 10);
-void generateTimeWindows(Graph* g, int open, int close, int maxService);
-void generateTravelTimes(Graph* g, int min, int max);
+void loadDistances(Graph* g, int n, int** dist);
+void loadTimeWindows(Graph* g, int n, int** windows);
+void loadTravelTimes(Graph* g, int n, int** times);
 Graph* firstAuxiliaryGraph(Graph* g);
-int loadATSP(char* name, int* dist);
+
+int loadATSP(string name, int*** dist);
+int** calcTimeTravel(int n, int** dist, int max_t);
+int** generateTimeWindows(int n, int close, int maxService, int seed = 5);
+int* generateHourMultipler(int n, int variation = 15);
+void printTab(int n, int m, int** t);
 
 
 int main() {
-	srand(5);
-	int n4 = 4;
-	int* dist;
-	int* windows;
-	int* t;
+	int m;
+	int workHours = 12;
+	int** dist;
+	int** windows;
+	int** t;
 	int* f;
-	int n = 6; // liczba wierzchołków
-	Graph* dg = new Graph(n, 6);
-	Graph* tg;
+	m = loadATSP(string("br17"), &dist);
+	t = calcTimeTravel(m, dist, workHours * 60);
+	windows = generateTimeWindows(m, workHours * 60, 10);
+	f = generateHourMultipler(workHours);
+	// printTab(m, 3, windows);
+	// printTab(1, 12, &f);
+	
+	for (int i = 0; i < m; ++i) {
+		delete [] dist[i];
+		delete [] windows[i];
+		delete [] t[i];
+	}
+	delete []dist;
+	delete []windows;
+	delete []t;
 
-	generateTimeWindows(dg, 0, 41, 0);
-	generateDistances(dg, 20, 50);
-	generateTravelTimes(dg, 1, 12);
-	tg = firstAuxiliaryGraph(dg);
-	tg->convertToSecondAuxiliaryGraph(dg);
+	// int n = 6; // liczba wierzchołków
+	// Graph* dg = new Graph(n, 6);
+	// Graph* tg;
 
-	delete dg;
-	delete tg;
+	// loadDistances(dg, n, dist);
+	// generateTimeWindows(dg, 0, 41, 0);
+	// generateTravelTimes(dg, 1, 12);
+	// tg = firstAuxiliaryGraph(dg);
+	// tg->convertToSecondAuxiliaryGraph(dg);
+
+	// delete dg;
+	// delete tg;
 
 	return 0;
 }
@@ -45,56 +66,28 @@ int main() {
 
 /* NOWE */
 
-void generateDistances(Graph* g, int min, int max, int variation /* = 10 */) {
-	int i, j, c, n;
-	if(RANDOM) srand(time(0));
+void loadDistances(Graph* g, int n, int** dist) {
+	int i, j;
 
-	n = g->getN();
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < n; ++i)
 		for (j = 0; j < n; ++j) {
 			if (i == j) continue;
-			if (i < j) {
-				g->addArc(i, j, rand()%(max - min + 1) + min);
-			} else {
-				c = g->getArcDist(j, i);
-				g->addArc(i, j,
-					rand() % (c *(100 + variation)/100 - c *(100 - variation)/100 + 1) + c *(100 - variation)/100);
-			}
+			g->addArc(i, j, dist[i][j]);
 		}
+}
+
+void loadTimeWindows(Graph* g, int n, int** windows) {
+	for (int i = 0; i < n; ++i) {
+		g->setTimeWindow(i, windows[i][0], windows[i][1], windows[i][2]);
 	}
 }
 
-void generateTimeWindows(Graph* g, int open, int close, int maxService) {
-	int op, cl, s = 0;
-
-	if(RANDOM) srand(time(0));
-	
-	g->setTimeWindow(0, open, close, 0);
-	for (int i = 1; i < g->getN(); ++i) {
-		op = rand() % (close - open + 1) + open;
-		cl = rand() % (close - op + 1) + op;
-		if(maxService > 0) s = rand() % (maxService + 1);
-		g->setTimeWindow(i, op, cl, s);
-	}
-}
-
-void generateTravelTimes(Graph* g, int min, int max) {
-	int i, j, n, t;
-	n = g->getN();
-
-	if(RANDOM) srand(time(0));
-
-	for (i = 0; i < n; ++i) {
-		for (j = 0; j < n; ++j) {
+void loadTravelTimes(Graph* g, int n, int** times) {
+	for (int i = 0; i < n; ++i)
+		for (int j = 0; j < n; ++j) {
 			if (i == j) continue;
-			t = rand() % (max - min + 1) +  min;
-			if (i < j) {
-				g->setArcTravelTime(i, j, t);
-			} else {
-				g->setArcTravelTime(i, j, t);
-			}
+			g->setArcTravelTime(i, j, times[i][j]);
 		}
-	}
 }
 
 Graph* firstAuxiliaryGraph(Graph* graph){
@@ -116,19 +109,89 @@ Graph* firstAuxiliaryGraph(Graph* graph){
 	return g;
 }
 
-int loadATSP(char* name, int* dist) {
+int loadATSP(string name, int*** dist) {
+	ifstream plik;
 	string line;
-	ifstream myfile ("atsp/" + name);
-	if (myfile.is_open()) {
-		while ( getline (myfile, line) ) {
-			cout << line << '\n';
-		}
-		myfile.close();
+	int i, j, n;
+	int** d;
+
+	plik.open((string("atsp/") + name + string(".atsp")).c_str());
+	if (!plik.good()) return 0;
+
+	while (line.find("DIMENSION:")) { plik >> line; }
+	plik >> n;
+	d = new int*[n];
+	for (i = 0; i < n; ++i) {
+		d[i] = new int[n];
+	}
+	while (line.find("EDGE_WEIGHT_SECTION")) { // getline (plik, line) ) {//pętla nieskończona
+		plik >> line;
+	}
+	for (i = 0; i < n; ++i)
+		for (j = 0; j < n; ++j)
+			plik >> d[i][j];
+	plik.close();
+	*dist = d;
+	return n;
+}
+
+int** calcTimeTravel(int n, int** dist, int max_t) {
+	int i, j, sum, s;
+	int** d;
+
+	d = new int*[n];
+	for (i = 0; i < n; ++i) {
+		d[i] = new int[n];
 	}
 
-	else cout << "Unable to open file";
+	sum = 0;
+	for (i = 0; i < n; ++i) {
+		s = 0;
+		for (j = 0; j < n; ++j) {
+			if (i == j) continue;
+			s = max(dist[i][j], s);
+		}
+		sum += s;
+	}
+	sum >>= 1;
 
-	return 0;
+	for (i = 0; i < n; ++i)
+		for (j = 0; j < n; ++j)
+			d[i][j] = dist[i][j] * max_t / sum;
+	return d;
+}
+
+int** generateTimeWindows(int n, int close, int maxService, int seed /* = 5 */) {
+	int a, b, i;
+	int** d;
+
+	srand(seed);
+	d = new int*[n];
+	for (i = 0; i < n; ++i)
+		d[i] = new int[3];
+
+	for (i = 0; i < n; ++i) {
+		a = rand() % close;
+		b = rand() % close;
+		if (a > b) {
+			d[i][0] = b;
+			d[i][1] = a;
+		} else {
+			d[i][0] = a;
+			d[i][1] = b;
+			
+		}
+		d[i][2] = rand() % maxService;;
+	}
+	return d;
+}
+
+int* generateHourMultipler(int n, int variation /* = 15 */) {
+	/* seed has beed set earlier !*/
+	int* d = new int[n];
+	for (int i = 0; i < n; ++i)
+		d[i] = rand() % (20 * variation + 1) + 1000 - variation * 10;
+	return d;
 }
 
 // Graph* firstGraph(int n, int* graph, int* windows){
@@ -165,14 +228,14 @@ int loadATSP(char* name, int* dist) {
 // 	return g;
 // }
 
-// void printTab(int n, int m, int* t){
-// 	int i, j;
-// 	for(i = 0; i < n; ++i){
-// 		cout<<"[";
-// 		for(j = 0; j < m - 1; ++j) cout<<t[i + j*n]<<", ";
-// 		cout<<t[i + j*n]<<"]\n";
-// 	}
-// }
+void printTab(int n, int m, int** t){
+	int i, j;
+	for (i = 0; i < n; ++i) {
+		cout << "[";
+		for (j = 0; j < m-1 ; ++j) cout << t[i][j] << ", ";
+		cout << t[i][j] << "]\n";
+	}
+}
 // void printTab(int n, int* t){ printTab(n,n,t); }
 
 
