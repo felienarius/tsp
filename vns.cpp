@@ -8,14 +8,6 @@
 
 using namespace std;
 
-int GODZINY_PRACY = 10;
-int MAX_DELAY = 15;
-double NADGODZINA_KOSZT = 30;
-double DROGA_KOSZT = 0.4;
-double KOSZT_SPOZNIENIA = 0.5;
-double KOSZT_NIEDOSTARCZENIA = 20; // (na czas)
-double GODZINA_KOSZT = 15;
-
 void printT(int n, int *t){
 	int i;
 	cout << "[";
@@ -23,123 +15,46 @@ void printT(int n, int *t){
 	cout << t[i] << "]\n";
 }
 
-int f_cost(int distance, int k, int missed, int delay) {
-	cout << ">>f_cost " << distance << " " << k << " " << missed << " " << delay <<	endl;
-	int cost, work = 1 + (k-1)/60;
-
-	cost =  GODZINA_KOSZT * min(work, GODZINY_PRACY) +
-		NADGODZINA_KOSZT * max(0, work - GODZINY_PRACY) +
-		DROGA_KOSZT * distance + 
-		KOSZT_SPOZNIENIA * delay +
-		KOSZT_NIEDOSTARCZENIA * missed;
-	cout << "<<f_cost " << distance << " " << k << " " << missed << " " << delay <<	" " << cost << endl;
-	return cost;
-}
-
-int cost(int n, int **dist, int **t, int **w, int *f, int *perm, int *last_valid) {
-	cout << ">>cost " << perm << /*" " << last_valid << */endl;
-	int distance, delay, missed, close, k, i, j, a, cost;
-	// printT(20, perm);
-
-	distance = delay = missed = 0;
-	k = perm[0];
-
-	j = perm[1];
-	for (a = 1; a < n + 1; ++a) {
-		i = j;
-		j = perm[a + 1];
-		k += w[i][2];
-		k += max(t[i][j] * f[k/60]/1000, w[j][0]);
-		distance += dist[i][j];
-		close = w[j][1];
-		if (k > close) {
-			if (k > close + MAX_DELAY) ++missed;
-			delay += k - close;
-		}
-	}
-	// if (missed == 0) {
-	// 	delete []last_valid;
-	// 	copy(&perm[0], &perm[n + 3], &last_valid[0]);
-	// }
-	cost = f_cost(distance, k, missed, delay);
-	cout << "<<cost " << perm << " " /*<< last_valid << " "*/ << cost << endl;
-	return cost;
-}
-
-int *sortTimeWindows(int n, int **win) {
-	int i, j, tmp;
-	int *mid = new int[n-1];
-	int *sort = new int[n-1];
-	for (i = 1; i < n; ++i) {
-		mid[i - 1] = (win[i][0] + win[i][1]) / 2;
-		sort[i - 1] = i;
-	}
-	for (i = 0; i < n - 1; ++i) {
-		for (j = 0; j < n - 1; ++j) {
-			if (i == j) continue;
-			if (mid[i] < mid[j]) {
-				swap(mid[i], mid[j]);
-				swap(sort[i], sort[j]);
-			}
-		}	
-	}
-	delete []mid;
-	return sort;
-}
-
-int calcRouteEndingAt(int index /* is [1, n-1] */, int node, int n,
-	int *perm, int **t, int **win, int *f)
-{
-	int a, b, i, j, sum;
-
-	sum = 0;
-	a = 0;
-	b = 1;
-	j = 0;
-	while (j != node) {
-		if (a == 0) i = 0;
-		else i = perm[a];
-
-		if (b == index) j = node;
-		else j = perm[b];
-
-		sum += win[i][2];
-		sum = max(t[i][j] * f[sum/60]/1000, win[j][0]);
-		++a;++b;
-	}
-	return sum;
-}
 
 
-int calcRouteStartingAt(int index /* index in route */, int node /* node index */,
-int k /* time instance at this node */, int n, int *perm, int **t, int **win, int *f)
-{
-	int a, b, i, j, sum;
-	a = index;
-	b = index + 1;
-	sum = k;
-	j = 1;
-	while (j != 0) {
-		if (a == index) i = node;
-		else i = perm[a];
+// int cost(int n, int **dist, int **t, int **w, int *f, int *perm, int *last_valid) {
+// 	cout << ">>cost " << perm << /*" " << last_valid << */endl;
+// 	int distance, delay, missed, close, k, i, j, a, cost;
+// 	// printT(20, perm);
 
-		if (b == n) j = 0;
-		else j = perm[b];
+// 	distance = delay = missed = 0;
+// 	k = perm[0];
 
-		sum += win[i][2];
-		sum += max(t[i][j] * f[sum/60]/1000, win[j][0]);
-		++a;++b;
-	}
+// 	j = perm[1];
+// 	for (a = 1; a < n + 1; ++a) {
+// 		i = j;
+// 		j = perm[a + 1];
+// 		k += w[i][2];
+// 		k += max(t[i][j] * f[k/60]/1000, w[j][0]);
+// 		distance += dist[i][j];
+// 		close = w[j][1];
+// 		if (k > close) {
+// 			if (k > close + MAX_DELAY) ++missed;
+// 			delay += k - close;
+// 		}
+// 	}
+// 	// if (missed == 0) {
+// 	// 	delete []last_valid;
+// 	// 	copy(&perm[0], &perm[n + 3], &last_valid[0]);
+// 	// }
+// 	cost = f_cost(distance, k, missed, delay);
+// 	cout << "<<cost " << perm << " " /*<< last_valid << " "*/ << cost << endl;
+// 	return cost;
+// }
 
-	return sum;
-}
 
-void insertNode(int n, int *perm, int index, int node) {
-	for (int i = n - 2; i >= index; --i) {
-		swap(perm[i], perm[i + 1]);
-	}
-	perm[index] = node;
-}
+
+
+
+
+
+
+
 
 
 

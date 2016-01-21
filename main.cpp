@@ -22,8 +22,20 @@ struct Route {
 	int n;
 	int k;
 	int cost;
+	int distance;
+	int workHours;
+	int delay;
+	int missed;
 	int *seq;
 };
+
+int GODZINY_PRACY = 10;
+int MAX_DELAY = 15;
+double KOSZT_GODZINA = 15;
+double NADGODZINA_KOSZT = 30;
+double DROGA_KOSZT = 0.4;
+double KOSZT_SPOZNIENIA = 0.5;
+double KOSZT_NIEDOSTARCZENIA = 20; /*per node*/
 
 void loadDistances(Graph *g, int n, int **dist);
 void loadTimeWindows(Graph *g, int n, int **windows);
@@ -33,7 +45,7 @@ Graph *firstAuxiliaryGraph(Graph *g);
 int loadATSP(string name, int ***dist);
 int **calcTimeTravel(int n, int **dist, int max_t);
 int **generateTimeWindows(int n, int close, int maxService, int seed = 5);
-int *generateHourMultipler(int n, int variation = 15);
+int *generateHourMultipler(int n, int variation = 15, int seed = 5);
 void printTab(int n, int m, int **t);
 void printTab(int n, int *t);
 void printData(Data *d);
@@ -41,6 +53,12 @@ void printRoute(Route *r);
 
 Route *search(Data *d, int neighborhoods, int max_no_improv, int max_no_improv_ls);
 Route *firstRoute(Data *d);
+int *sortTimeWindows(int n, int **win);
+int calcRouteEndingAt(Data *d, Route *r, int index, int node);
+int calcRouteStartingAt(Data *d, Route *r, int index , int node , int k);
+void insertNode(Route *r, int index, int node);
+int calcRouteCost(Data *d, Route *r);
+int f_cost(int distance, int k, int missed, int delay);
 
 int main() {
 	int workHours = 12;
@@ -182,7 +200,7 @@ int** calcTimeTravel(int n, int** dist, int max_t) {
 		}
 		sum += s;
 	}
-	sum >>= 1;
+	sum = sum*1/2;
 
 	for (i = 0; i < n; ++i)
 		for (j = 0; j < n; ++j)
@@ -217,10 +235,12 @@ int** generateTimeWindows(int n, int close, int maxService, int seed /* = 5 */) 
 	return d;
 }
 
-int* generateHourMultipler(int n, int variation /* = 15 */) {
-	/* seed has beed set earlier !*/
+int* generateHourMultipler(int n, int variation /* = 15 */, int seed /* = 5 */) {
+	int i;
+
+	srand(seed);
 	int* d = new int[n];
-	for (int i = 0; i < n; ++i)
+	for (i = 0; i < n; ++i)
 		d[i] = rand() % (20 * variation + 1) + 1000 - variation * 10;
 	return d;
 }
@@ -252,20 +272,25 @@ void printData(Data *d) {
 void printRoute(Route *r) {
 	cout << "\tRoute seq(" << r->n << "):\n";
 	printTab(r->n, r->seq);
-	cout << "\tRoute cost: " << r->cost << endl;
-	cout << "\tRoute k:    " << r->k << endl;
+	cout << "  k, cost, distance, workHours, delay, missed\n";
+	cout << "R[" << r->k << ", "
+		<< r->cost << ", "
+		<< r->distance << ", "
+		<< r->workHours << ", "
+		<< r->delay << ", "
+		<< r->missed << "]\n";
 }
 
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
 	srand(5);
 	int iter, count, i, j;
-	Route *best; //, *last_valid;
+	Route *r; //, *last_valid;
 	/* perm[0] = cost  perm[1] = k  perm[2 - n-1]*/
-	best = firstRoute(d);
+	r = firstRoute(d);
 	// printT(16, best->seq);
 	// last_valid = new int[n + 3];
-	// best[0] = cost(n, dist, t, win, f, &best[1], NULL);
+	calcRouteCost(d, r);
 	// printT(20, best);
 	// iter = count = 0;
 	// do {
@@ -300,50 +325,168 @@ Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
 	// } while (count < max_no_improv);
 
 	// delete []last_valid;
-	return best;
+	return r;
 }
 
 Route *firstRoute(Data *d) {
-	// int i, j, nodes, k, left;
-	// int *sorted, *lnodes = new int[n - 1];
-	Route *perm = new Route(); /* perm[0] = cost  perm[1] = k  perm[2 - n-1]*/
-	perm->k = 0;
-	perm->n = d->n - 1;
-	perm->cost = 0;
-	perm->seq = new int[perm->n];
-	for (int i = 1; i < d->n; ++i)
-		perm->seq[i - 1] = i;
+	int i, j, nodes, k, left, sum;
+	int *sorted, *lnodes;
+	Route *r = new Route();
+	r->n = d->n - 1;
+	r->k = 0;
+	r->cost = 0;
+	r->distance = 0;
+	r->workHours = 0;
+	r->delay = 0;
+	r->missed = 0;
+	r->seq = new int[r->n];
+	for (i = 0; i < r->n; ++i)
+		r->seq[i] = 0;
+	lnodes = new int[r->n];
 
-	// cout << "WHAT";
-	// sorted = sortTimeWindows(n, win); // [n-1] elem
-	// nodes = 0;
-	// left = 0;
-	// j = sorted[nodes];
-	// for (int a = 0; a < 14; ++a) {
-	// 	for(i = 1; i < nodes + left + 2; ++i) {
-	// 		k = calcRouteEndingAt(i, j, n, perm, t, win, f);
-	// 		if (k <= win[j][1]) {
-	// 			if (calcRouteStartingAt(i, j, k, n, perm, t, win, f) <= win[0][1]) {
-	// 				insertNode(n, perm, i, j);
-	// 				j = sorted[++nodes];
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// }
+	sorted = sortTimeWindows(r->n, d->windows);
+	nodes = 0;
+	left = 0;
+	while(nodes + left < r->n) {
+		for(i = 0; i < nodes + left + 2; ++i) {
+			j = sorted[nodes + left];
+			k = calcRouteEndingAt(d, r, i, j);
+			if (k <= d->windows[j][1]) {
+				sum = calcRouteStartingAt(d, r, i, j, k);
+				if (sum <= d->windows[0][1]) {
+					cout << sum << " HIT " << calcRouteCost(d, r) <<"\n";
+					printT(r->n, r->seq);
+					insertNode(r, i, j);
+					printT(r->n, r->seq);
+					i = nodes + left + 3;
+					break;
+				}
+			}
+		}
+		if (i <= nodes + left + 2) {
+			cout << "--HIT " << ++left << endl;
+		} else {
+			++nodes;
+		}
+	}
+	delete []sorted;
+	delete []lnodes;
+	return r;
+}
 
-	// for(i = 1; i < nodes + left + 2; ++i) {
-	// 	k = calcRouteEndingAt(i, j, n, perm, t, win, f);
-	// 	if (k <= win[j][1]) {
-	// 		if (calcRouteStartingAt(i, j, k, n, perm, t, win, f) <= win[0][1]) {
-	// 			insertNode(n, perm, i, j);
-	// 			j = sorted[++nodes];
-	// 			break;
-	// 		}
-	// 	}
+int *sortTimeWindows(int n, int **win) {
+	int i, j, tmp;
+	int *mid = new int[n];
+	int *sort = new int[n];
+	for (i = 0; i < n; ++i) {
+		mid[i] = (win[i + 1][0] + win[i + 1][1]) / 2;
+		sort[i] = i + 1;
+	}
+	for (i = 0; i < n - 1; ++i) {
+		for (j = 0; j < n - 1; ++j) {
+			if (i == j) continue;
+			if (mid[i] < mid[j]) {
+				swap(mid[i], mid[j]);
+				swap(sort[i], sort[j]);
+			}
+		}	
+	}
+	delete []mid;
+	return sort;
+}
+
+int calcRouteEndingAt(Data *d, Route *r, int index, int node) {
+	int a, b, i, j, sum;
+
+	sum = 0;
+	a = -1;
+	b = 0;
+	do {
+		if (a == -1) i = 0;
+		else i = r->seq[a];
+
+		if (b == index) j = node;
+		else j = r->seq[b];
+
+		sum += d->windows[i][2];
+		sum = max(d->t[i][j] * d->f[min(sum, d->windows[0][1])/60]/1000, d->windows[j][0]);
+		++a;++b;
+	} while (b < index);
+	return sum;
+}
+
+int calcRouteStartingAt(Data *d, Route *r, int index , int node , int k) {
+	int a, b, i, j, sum;
+
+	sum = k;
+	a = index - 1;
+	b = index;
+	do {
+		if (a == index - 1) i = node;
+		else i = r->seq[a];
+
+		if (b == r->n) j = 0;
+		else j = r->seq[b];
+
+		sum += d->windows[i][2];
+		sum += max(d->t[i][j] * d->f[min(sum, d->windows[0][1])/60]/1000, d->windows[j][0]);
+		++a;++b;
+	} while (j != 0);
+	return sum;
+}
+
+void insertNode(Route *r, int index, int node) {
+	int i;
+
+	for (i = r->n - 2; i >= index; --i)
+		swap(r->seq[i], r->seq[i + 1]);
+	r->seq[index] = node;
+}
+
+int calcRouteCost(Data *d, Route *r) {
+	int distance, delay, missed, close, k, i, j, a, cost;
+
+	distance = delay = missed = cost = 0;
+	k = r->k;
+	a = -1;
+	while (a + 1 < r->n) {
+		// cout << "a " << a << endl;
+		if (a == -1) i = 0;
+		else i = r->seq[a];
+
+		if (++a == r->n) j = 0;
+		else j = r->seq[a];
+		cout << i << " " << j << " " << k << endl;
+		k += d->windows[i][2];
+		k += max(d->t[i][j] * d->f[min(k, d->windows[0][1])/60]/1000, d->windows[j][0]);
+		distance += d->dist[i][j];
+		close = d->windows[j][1];
+		if (k > close) {
+			if (k > close + MAX_DELAY) ++missed;
+			delay += k - close;
+		}
+	}
+	// if (missed == 0) {
+	// 	delete []last_valid;
+	// 	copy(&perm[0], &perm[n + 3], &last_valid[0]);
 	// }
-	// cout << "WHAT";
-	// delete []sorted;
-	// delete []lnodes;
-	return perm;
+	cost = f_cost(distance, k, missed, delay);
+	r->cost = cost;
+	r->distance = distance;
+	r->workHours = k - r->k;
+	r->delay = delay;
+	r->missed = missed;
+	return cost;
+}
+
+int f_cost(int distance, int k, int missed, int delay) {
+	int cost, work;
+
+	work = 1 + (k-1)/60;
+	cost =  KOSZT_GODZINA * min(work, GODZINY_PRACY) +
+		NADGODZINA_KOSZT * max(0, work - GODZINY_PRACY) +
+		DROGA_KOSZT * distance + 
+		KOSZT_SPOZNIENIA * delay +
+		KOSZT_NIEDOSTARCZENIA * missed;
+	return cost;
 }
