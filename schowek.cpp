@@ -4,29 +4,11 @@ using namespace std;
 
 int main()
 {
-    int a[ 8 ] = { 1, 2, 3, 4, 5, 6, 7, 8};
-    int b[ 8 ] = { 4, 8, 11, 42, 69, 74, 666, -3 };
-    
-    cout << "Tablica a przed kopiowaniem: \n";
-    for( int i = 0; i < 8; i++ )
-    {
-        cout << a[ i ] << '\n';
-    }
-    
-    copy( b, b + 9, a );
-    
-    cout << "Tablica a po kopiowaniu: \n";
-    for( int i = 0; i < 8; i++ )
-    {
-        cout << a[ i ] << '\n';
-    }
-cout << "Tab b\n";
+	int a;
+	int sum = 155565;
 
-    for( int i = 0; i < 8; i++ )
-    {
-        cout << b[ i ] << '\n';
-    }
-    cout << a << " " << b << endl; 
+    a = min(sum, 720) /60;
+    cout << a << endl; 
 }
 
 // br17: 39

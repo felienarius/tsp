@@ -58,7 +58,7 @@ int calcRouteEndingAt(Data *d, Route *r, int index, int node);
 int calcRouteStartingAt(Data *d, Route *r, int index , int node , int k);
 void insertNode(Route *r, int index, int node);
 int calcRouteCost(Data *d, Route *r);
-int f_cost(int distance, int k, int missed, int delay);
+int f_cost(int distance, int workHours, int missed, int delay);
 
 int main() {
 	int workHours = 12;
@@ -240,8 +240,9 @@ int* generateHourMultipler(int n, int variation /* = 15 */, int seed /* = 5 */) 
 
 	srand(seed);
 	int* d = new int[n];
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < n; ++i) {
 		d[i] = rand() % (20 * variation + 1) + 1000 - variation * 10;
+	}
 	return d;
 }
 
@@ -352,9 +353,9 @@ Route *firstRoute(Data *d) {
 			j = sorted[nodes + left];
 			k = calcRouteEndingAt(d, r, i, j);
 			if (k <= d->windows[j][1]) {
-				sum = calcRouteStartingAt(d, r, i, j, k);
+				sum = calcRouteStartingAt(d, r, i, j, max(k, d->windows[j][0]));
 				if (sum <= d->windows[0][1]) {
-					cout << sum << " HIT " << calcRouteCost(d, r) <<"\n";
+					cout << k << " + " << sum << " HIT " << calcRouteCost(d, r) <<"\n";
 					printT(r->n, r->seq);
 					insertNode(r, i, j);
 					printT(r->n, r->seq);
@@ -429,7 +430,8 @@ int calcRouteStartingAt(Data *d, Route *r, int index , int node , int k) {
 		else j = r->seq[b];
 
 		sum += d->windows[i][2];
-		sum += max(d->t[i][j] * d->f[min(sum, d->windows[0][1])/60]/1000, d->windows[j][0]);
+		cout << "min(sum, d->windows[0][1] - 60)/60 = " << min(sum, d->windows[0][1] - 60)/60 << endl;
+		sum += max(d->t[i][j] * d->f[min(sum, d->windows[0][1] - 60)/60]/1000, d->windows[j][0]);
 		++a;++b;
 	} while (j != 0);
 	return sum;
@@ -444,47 +446,48 @@ void insertNode(Route *r, int index, int node) {
 }
 
 int calcRouteCost(Data *d, Route *r) {
-	int distance, delay, missed, close, k, i, j, a, cost;
+	int distance, delay, missed, close, k, i, j, a, b, cost;
 
 	distance = delay = missed = cost = 0;
 	k = r->k;
-	a = -1;
-	while (a + 1 < r->n) {
-		// cout << "a " << a << endl;
+	a = - 1;
+	b = 0;
+	do {
 		if (a == -1) i = 0;
 		else i = r->seq[a];
 
-		if (++a == r->n) j = 0;
-		else j = r->seq[a];
-		cout << i << " " << j << " " << k << endl;
+		if (b == r->n) j = 0;
+		else j = r->seq[b];
+
+		// cout << "k += " << d->windows[i][2] << endl;
 		k += d->windows[i][2];
-		k += max(d->t[i][j] * d->f[min(k, d->windows[0][1])/60]/1000, d->windows[j][0]);
+		// cout << "min(k, d->windows[0][1])/60 = " << min(k, d->windows[0][1])/60 << endl;
+		// cout << "k += [" << i << "][" << j << "] max(" << d->t[i][j] << " * d->f[min(" << k << ", " << d->windows[0][1] << ")/60]/1000, " << d->windows[j][0] << ");\n";
+		k += max(d->t[i][j] * d->f[min(k, d->windows[0][1])/60 - 1]/1000, d->windows[j][0]);
+		// cout << "k = " << k << "\n\n";
 		distance += d->dist[i][j];
 		close = d->windows[j][1];
 		if (k > close) {
 			if (k > close + MAX_DELAY) ++missed;
 			delay += k - close;
 		}
-	}
-	// if (missed == 0) {
-	// 	delete []last_valid;
-	// 	copy(&perm[0], &perm[n + 3], &last_valid[0]);
-	// }
-	cost = f_cost(distance, k, missed, delay);
+		++a;++b;
+	} while (j != 0);
+
 	r->cost = cost;
 	r->distance = distance;
-	r->workHours = k - r->k;
+	r->workHours = 1 + (k - r->k - 1) / 60;
 	r->delay = delay;
 	r->missed = missed;
+	cost = f_cost(distance, r->workHours, missed, delay);
 	return cost;
 }
 
-int f_cost(int distance, int k, int missed, int delay) {
+int f_cost(int distance, int workHours, int missed, int delay) {
 	int cost, work;
 
-	work = 1 + (k-1)/60;
-	cost =  KOSZT_GODZINA * min(work, GODZINY_PRACY) +
-		NADGODZINA_KOSZT * max(0, work - GODZINY_PRACY) +
+	cost =  KOSZT_GODZINA * min(workHours, GODZINY_PRACY) +
+		NADGODZINA_KOSZT * max(0, workHours - GODZINY_PRACY) +
 		DROGA_KOSZT * distance + 
 		KOSZT_SPOZNIENIA * delay +
 		KOSZT_NIEDOSTARCZENIA * missed;

@@ -4,6 +4,94 @@
 		"selected_items":
 		[
 			[
+				"work",
+				"workHours"
+			],
+			[
+				"KOSZ",
+				"KOSZT_GODZINA"
+			],
+			[
+				"ca",
+				"calcRouteCost"
+			],
+			[
+				"print",
+				"printT"
+			],
+			[
+				"w",
+				"windows"
+			],
+			[
+				"pr",
+				"printData"
+			],
+			[
+				"win",
+				"windows"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"pri",
+				"printT"
+			],
+			[
+				"inde",
+				"index2"
+			],
+			[
+				"index",
+				"index1"
+			],
+			[
+				"de",
+				"delay"
+			],
+			[
+				"go",
+				"GODZINY_PRACY"
+			],
+			[
+				"GO",
+				"GODZINY_PRACY"
+			],
+			[
+				"di",
+				"dist"
+			],
+			[
+				"dist",
+				"distance"
+			],
+			[
+				"in",
+				"insertNode"
+			],
+			[
+				"sort",
+				"sorted"
+			],
+			[
+				"fo",
+				"for	For Loop"
+			],
+			[
+				"sor",
+				"sortTimeWindowsByOpen"
+			],
+			[
+				"ge",
+				"generateHourMultipler"
+			],
+			[
+				"max",
+				"maxService"
+			],
+			[
 				"en",
 				"endl"
 			],
@@ -24,24 +112,8 @@
 				"countArcsByStart"
 			],
 			[
-				"ge",
-				"getNodeClose"
-			],
-			[
 				"getNo",
 				"getNodeOpen"
-			],
-			[
-				"pr",
-				"print"
-			],
-			[
-				"max",
-				"maxDist"
-			],
-			[
-				"pri",
-				"printNodes"
 			],
 			[
 				"clear",
@@ -104,20 +176,12 @@
 				"best_cost"
 			],
 			[
-				"ca",
-				"candidate_cost"
-			],
-			[
 				"rand",
 				"random_permutation"
 			],
 			[
 				"can",
 				"candidate_cost"
-			],
-			[
-				"w",
-				"windows"
 			],
 			[
 				"pu",
@@ -131,15 +195,7 @@
 			"file": "main.cpp",
 			"settings":
 			{
-				"buffer_size": 5089,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Graph.cpp",
-			"settings":
-			{
-				"buffer_size": 8690,
+				"buffer_size": 11461,
 				"line_ending": "Windows"
 			}
 		},
@@ -147,9 +203,16 @@
 			"file": "schowek.cpp",
 			"settings":
 			{
-				"buffer_size": 1667,
-				"line_ending": "Windows",
-				"name": "schowek"
+				"buffer_size": 1899,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Graph.cpp",
+			"settings":
+			{
+				"buffer_size": 6592,
+				"line_ending": "Windows"
 			}
 		},
 		{
@@ -169,28 +232,11 @@
 			}
 		},
 		{
-			"file": "atsp/br17.atsp",
-			"settings":
-			{
-				"buffer_size": 1636,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "vns.cpp",
 			"settings":
 			{
-				"buffer_size": 3489,
+				"buffer_size": 3734,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "vns.ruby",
-			"settings":
-			{
-				"buffer_size": 2949,
-				"line_ending": "Windows",
-				"name": "def euc_2d(c1, c2)"
 			}
 		}
 	],
@@ -210,7 +256,7 @@
 			],
 			[
 				"Packages/C++/C++ Single File.sublime-build",
-				""
+				"Run"
 			]
 		]
 	],
@@ -242,6 +288,12 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Admin/Documents/GitHub/tsp/schowek.cpp",
+		"/C/Users/Admin/Documents/GitHub/tsp/vns.ruby",
+		"/C/Users/Admin/Documents/GitHub/tsp/#5za forem 9",
+		"/C/Users/Admin/Documents/GitHub/tsp/atsp/br17.atsp",
+		"/C/Users/Admin/Documents/GitHub/tsp/atsp/ry48p.atsp",
+		"/C/Users/Admin/Documents/GitHub/tsp/atsp/ft53.atsp",
 		"/C/Users/Admin/Documents/GitHub/tsp/graph.cpp",
 		"/C/Users/Admin/Documents/GitHub/tsp/graph.h",
 		"/c/mingw/lib/gcc/mingw32/4.8.1/include/c++/bits/stl_iterator_base_types.h",
@@ -270,6 +322,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"HIT",
+			"srand",
+			"sra",
 			"]",
 			"[",
 			"exclude",
@@ -308,15 +363,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5089,
+						"buffer_size": 11461,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3301,
-								3301
+								5093,
+								5093
 							]
 						],
 						"settings":
@@ -324,7 +379,7 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 3270.0,
+						"translation.y": 4853.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -332,19 +387,47 @@
 				},
 				{
 					"buffer": 1,
-					"file": "Graph.cpp",
+					"file": "schowek.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8690,
+						"buffer_size": 1899,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5388,
-								5388
+								101,
+								101
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Graph.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6592,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								75,
+								75
 							]
 						],
 						"settings":
@@ -353,36 +436,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2927.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "schowek.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1667,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1038,
-								1038
-							]
-						],
-						"settings":
-						{
-							"auto_name": "schowek",
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 858.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -414,7 +468,7 @@
 						"translation.y": 53.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -449,54 +503,24 @@
 			]
 		},
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
-					"buffer": 5,
-					"file": "atsp/br17.atsp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1636,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								674,
-								674
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 462.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
+					"buffer": 2,
 					"file": "Graph.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8690,
+						"buffer_size": 6592,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5948,
-								5948
+								262,
+								262
 							]
 						],
 						"settings":
@@ -505,27 +529,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4665.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "vns.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3489,
+						"buffer_size": 3734,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								589,
-								589
+								1430,
+								1430
 							]
 						],
 						"settings":
@@ -533,41 +557,10 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1539.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "vns.ruby",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2949,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								582,
-								582
-							]
-						],
-						"settings":
-						{
-							"auto_name": "def euc_2d(c1, c2)",
-							"syntax": "Packages/Ruby/Ruby.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -601,7 +594,7 @@
 		"cols":
 		[
 			0.0,
-			0.5,
+			0.617520215634,
 			1.0
 		],
 		"rows":
@@ -613,7 +606,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 245.0
+		"height": 325.0
 	},
 	"output.find_results":
 	{
