@@ -4,11 +4,27 @@ using namespace std;
 
 int main()
 {
-	int a;
-	int sum = 155565;
+	int n = 9;
+	int i = 8;
+	int node = -1;
+	int a[9] = {1,2,3,4,5,6,7,8};
+	int b[9] = {9,8,7,6,5,4,3,2,1};
+	// int sum = 155565;
+	cout << &node << endl;
+	cout << &b[i] << " " << b[i] << endl;
+	cout << &b[n] << " " << b[n] << endl;
+	copy(b+i, b+n-1, b+i+1);
+	b[i] = node;
+	cout << "copy\n" << &b[i] << " " << b[i] << endl;
+	cout << &b[n] << " " << b[n] << endl;
+	cout << b+i+1 << " " << *(b+i+1) << endl;
 
-    a = min(sum, 720) /60;
-    cout << a << endl; 
+	for (int i = 0; i < n; ++i)
+	{
+    	cout << b[i] << endl; 
+		/* code */
+	}
+    // a = min(sum, 720) /60;
 }
 
 // br17: 39
