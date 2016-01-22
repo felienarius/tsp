@@ -4,16 +4,48 @@
 		"selected_items":
 		[
 			[
+				"best",
+				"bestIndex"
+			],
+			[
+				"bs",
+				"bestIndex"
+			],
+			[
+				"bes",
+				"bestIndex"
+			],
+			[
+				"in",
+				"index"
+			],
+			[
+				"calc",
+				"calcRouteTravelTimeEndingAt"
+			],
+			[
+				"first",
+				"firstRoute"
+			],
+			[
+				"s",
+				"seq"
+			],
+			[
+				"tr",
+				"travelTime"
+			],
+			[
+				"ca",
+				"calcCost"
+			],
+			[
 				"work",
 				"workHours"
 			],
 			[
 				"KOSZ",
 				"KOSZT_GODZINA"
-			],
-			[
-				"ca",
-				"calcRouteCost"
 			],
 			[
 				"print",
@@ -66,10 +98,6 @@
 			[
 				"dist",
 				"distance"
-			],
-			[
-				"in",
-				"insertNode"
 			],
 			[
 				"sort",
@@ -156,24 +184,12 @@
 				"end"
 			],
 			[
-				"s",
-				"size"
-			],
-			[
 				"new",
 				"newNode"
 			],
 			[
-				"bes",
-				"best"
-			],
-			[
 				"cand",
 				"candidate"
-			],
-			[
-				"best",
-				"best_cost"
 			],
 			[
 				"rand",
@@ -195,7 +211,15 @@
 			"file": "main.cpp",
 			"settings":
 			{
-				"buffer_size": 11461,
+				"buffer_size": 12918,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "vns.cpp",
+			"settings":
+			{
+				"buffer_size": 3734,
 				"line_ending": "Windows"
 			}
 		},
@@ -203,7 +227,7 @@
 			"file": "schowek.cpp",
 			"settings":
 			{
-				"buffer_size": 1899,
+				"buffer_size": 2328,
 				"line_ending": "Windows"
 			}
 		},
@@ -228,14 +252,6 @@
 			"settings":
 			{
 				"buffer_size": 463,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "vns.cpp",
-			"settings":
-			{
-				"buffer_size": 3734,
 				"line_ending": "Windows"
 			}
 		}
@@ -363,15 +379,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11461,
+						"buffer_size": 12918,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5093,
-								5093
+								9835,
+								9835
 							]
 						],
 						"settings":
@@ -379,7 +395,7 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 4853.0,
+						"translation.y": 9010.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -387,19 +403,47 @@
 				},
 				{
 					"buffer": 1,
-					"file": "schowek.cpp",
+					"file": "vns.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1899,
+						"buffer_size": 3734,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								101,
-								101
+								1528,
+								1528
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": -0.0,
+						"translation.y": 1385.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "schowek.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2328,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								308,
+								346
 							]
 						],
 						"settings":
@@ -414,7 +458,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "Graph.cpp",
 					"semi_transient": false,
 					"settings":
@@ -439,11 +483,11 @@
 						"translation.y": 858.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "Node.cpp",
 					"semi_transient": false,
 					"settings":
@@ -468,11 +512,11 @@
 						"translation.y": 53.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "Arc.cpp",
 					"semi_transient": false,
 					"settings":
@@ -497,7 +541,7 @@
 						"translation.y": 111.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -507,7 +551,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "Graph.cpp",
 					"semi_transient": false,
 					"settings":
@@ -532,11 +576,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 1,
 					"file": "vns.cpp",
 					"semi_transient": false,
 					"settings":
@@ -548,8 +592,8 @@
 						"selection":
 						[
 							[
-								1430,
-								1430
+								1497,
+								1497
 							]
 						],
 						"settings":
@@ -560,7 +604,7 @@
 						"translation.y": 1539.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -594,7 +638,7 @@
 		"cols":
 		[
 			0.0,
-			0.617520215634,
+			0.562533692723,
 			1.0
 		],
 		"rows":
@@ -606,7 +650,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 325.0
+		"height": 304.0
 	},
 	"output.find_results":
 	{
@@ -646,7 +690,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 0,
+	"selected_group": 1,
 	"settings":
 	{
 	},

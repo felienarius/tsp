@@ -304,8 +304,8 @@ Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
 	r = firstRoute(d);
 	// printT(16, best->seq);
 	// last_valid = new int[n + 3];
-	calcRoute(d, r);
-	calcRouteCost(r);
+	// calcRoute(d, r);
+	// calcRouteCost(r);
 	// printT(20, best);
 	// iter = count = 0;
 	// do {
@@ -360,7 +360,7 @@ Route *firstRoute(Data *d) {
 	printT(r->n, sorted);
 
 	cout << "\tFirstRoute:\n";
-	while(nodes < r->n - 1) {
+	while(nodes < r->n) {
 		j = sorted[nodes];
 		bestIndex = nodes + 1;
 		for(i = 0; i < nodes + 1; ++i) {
@@ -384,7 +384,7 @@ Route *firstRoute(Data *d) {
 		}
 
 		cout << "\t\tbestIndex = " << bestIndex << "(" << best << ")\n";
-		insertNode(r, bestIndex % (1 + nodes), j);
+		insertNode(r, bestIndex % (nodes + 1), j);
 		++nodes;
 	}
 	delete []sorted;
@@ -439,8 +439,8 @@ int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node) {
 		cout << sum << endl;
 		s = d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
 		cout << "[" << i << "] -> " << s <<" -> [" << j << "]\n";
-		cout << "sum += max(" << s << ", " << d->windows[j][0] << ") = ";
-		sum += max(s, d->windows[j][0]);
+		cout << "sum = max(" << s << " + " << sum << ", " << d->windows[j][0] << ") = ";
+		sum = max(s + sum, d->windows[j][0]);
 		cout << sum << endl;
 		++a;++b;
 	} while (b <= index);
@@ -490,7 +490,7 @@ int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int 
 		s = d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
 		cout << "[" << i << "] -> " << s <<" -> [" << j << "]\n";
 		cout << "sum += max(" << s << ", " << d->windows[j][0] << ") = ";
-		sum += max(s, d->windows[j][0]);
+		sum = max(s + sum, d->windows[j][0]);
 		cout << sum << endl;
 		++a;++b;
 	} while (j != 0);
