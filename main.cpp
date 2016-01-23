@@ -16,6 +16,20 @@ struct Data {
 	int **t;
 	int **windows;
 	int *f;
+	Data(int nn = 1) {
+		n = nn;
+	}
+	~Data() {
+		for (int i = 0; i < n; ++i) {
+			delete []dist[i];
+			delete []t[i];
+			delete []windows[i];
+		}
+		delete []dist;
+		delete []t;
+		delete []windows;
+		delete []f;
+	}
 };
 
 struct Route {
@@ -28,14 +42,13 @@ struct Route {
 	int delay;
 	int missed;
 	int *seq;
-	Route(int a) {
+	Route(int a = 0) {
 		n = a;
 		cost = 0L;
 		k = distance = travelTime = workHours = delay = missed = 0;
 	}
-	Route() {
-		n = k = distance = travelTime = workHours = delay = missed = 0;
-		cost = 0L;
+	~Route() {
+		delete []seq;
 	}
 };
 
@@ -66,7 +79,7 @@ Route *search(Data *d, int neighborhoods, int max_no_improv, int max_no_improv_l
 Route *firstRoute(Data *d);
 int *sortTimeWindows(int n, int **win);
 int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node);
-int calcRouteTravelTimeEndingAt(Data *d, int *seq, int index, int node);
+// int calcRouteTravelTimeEndingAt(Data *d, int *seq, int index, int node);
 int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int k);
 void insertNode(Route *r, int index, int node);
 
@@ -119,17 +132,11 @@ int main() {
 	
 
 	// delete []best;
-	for (int i = 0; i < d->n; ++i) {
-		delete []d->dist[i];
-		delete []d->windows[i];
-		delete []d->t[i];
-	}
-	delete []d->dist;
-	delete []d->windows;
-	delete []d->t;
-	delete []d->f;
-	delete []best->seq;
+	
+	delete d;
+	delete best;
 
+	cin >> workHours;
 	return 0;
 }
 
@@ -284,24 +291,23 @@ void printData(Data *d) {
 	printTab(d->windows[0][1]/60, d->f);
 }
 void printRoute(Route *r) {
-	cout << "\tRoute seq(" << r->n << "):\n";
+	cout << "\tRoute seq(" << r->n << ", " << r->k << "):\n";
 	printTab(r->n, r->seq);
-	cout << "  k, cost, distance, workHours, delay, missed\n";
-	cout << "R[" << r->k << ", "
-		<< r->cost << ", "
-		<< r->distance << ", "
-		<< r->workHours << ", "
-		<< r->delay << ", "
-		<< r->missed << "]\n";
+	cout << "  cost = " << r->cost << endl
+		<< "  distance = " << r->distance << endl
+		<< "  travelTime = " << r->travelTime << endl
+		<< "  workHours = " << r->workHours << endl
+		<< "  delay = " << r->delay << endl
+		<< "  missed = " << r->missed << endl;
 }
 
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
-	srand(5);
 	int iter, count, i, j;
+	// srand(5);
 	Route *r; //, *last_valid;
-	/* perm[0] = cost  perm[1] = k  perm[2 - n-1]*/
 	r = firstRoute(d);
+	calcRoute(d, r);
 	// printT(16, best->seq);
 	// last_valid = new int[n + 3];
 	// calcRoute(d, r);
@@ -344,50 +350,41 @@ Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
 }
 
 Route *firstRoute(Data *d) {
-	int i, j, nodes, k, /*left, */sum, best, bestIndex;
-	int *sorted;/*, *lnodes;*/
+	int i, j, nodes, k, sum, best, bestIndex;
+	int *sorted;
+	bool missed;
 	Route *r;
 
 	r = new Route(d->n - 1);
-	// lnodes = new int[r->n];
 	r->seq = new int[r->n];
 	for (i = 0; i < r->n; ++i)
 		r->seq[i] = 0;
 	sorted = sortTimeWindows(r->n, d->windows);
 	nodes = 0;
-	// left = 0;
-	cout << "\tSorted:\n";
-	printT(r->n, sorted);
-
-	cout << "\tFirstRoute:\n";
 	while(nodes < r->n) {
 		j = sorted[nodes];
-		bestIndex = nodes + 1;
+		bestIndex = 0;
+		missed = 1;
 		for(i = 0; i < nodes + 1; ++i) {
-			printT(r->n, r->seq);
 			k = calcRouteTravelTimeEndingAt(d, r, i, j);
 			sum = calcRouteTravelTimeStartingAt(d, r, i, j, max(k, d->windows[j][0]));
 			if (k <= d->windows[j][1])
 				if (sum <= d->windows[0][1])
-					if (bestIndex > nodes || sum < best) {
+					if (missed || sum < best) {
 						best = sum;
 						bestIndex = i;
+						missed = 0;
 					}
-			if (bestIndex > nodes) {
-				if (i == 0)
+			if (missed)
+				if (sum < best || i == 0) {
 					best = sum;
-				if (sum < best) {
-					best = sum;
-					bestIndex = nodes + 1 + i;
+					bestIndex = i;
 				}
-			}
 		}
-
-		cout << "\t\tbestIndex = " << bestIndex << "(" << best << ")\n";
-		insertNode(r, bestIndex % (nodes + 1), j);
+		insertNode(r, bestIndex, j);
 		++nodes;
 	}
-	delete []sorted;
+	delete[] sorted;
 	return r;
 }
 
@@ -408,22 +405,13 @@ int *sortTimeWindows(int n, int **win) {
 			}
 		}	
 	}
-	delete []mid;
+	delete[] mid;
 	return sort;
 }
 
 int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node) {
-	int a, b, i, j, sum, s;
-	cout << "\tcalcRouteTravelTimeEndingAt(" << index << ", " << node << ")\n";
-	cout << "[";
-	for (i = -1; i < index; ++i) {
-		if (i == -1) cout << "0";
-		else cout << r->seq[i];
-		cout << ", ";
-	}
-	cout << node <<"]\n";
+	int a, b, i, j, sum;
 
-	cout << "sum = " << r->k << endl;
 	sum = r->k;
 	a = -1;
 	b = 0;
@@ -434,45 +422,17 @@ int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node) {
 		if (b == index) j = node;
 		else j = r->seq[b];
 
-		cout << "sum += w[" << i << "][2] += " << d->windows[i][2] << " = ";
 		sum += d->windows[i][2];
-		cout << sum << endl;
-		s = d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
-		cout << "[" << i << "] -> " << s <<" -> [" << j << "]\n";
-		cout << "sum = max(" << s << " + " << sum << ", " << d->windows[j][0] << ") = ";
-		sum = max(s + sum, d->windows[j][0]);
-		cout << sum << endl;
+		sum += d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
+		sum = max(sum, d->windows[j][0]);
 		++a;++b;
 	} while (b <= index);
-	// cout << "sum = " << sum << endl;
-	cout << "calcRouteTravelTimeEndingAt(" << index << ", " << node << ")\n";
-	return sum;
-}
-int calcRouteTravelTimeEndingAt(Data *d, int *seq, int index, int node) {
-	int sum;
-	Route *r = new Route(d->n - 1);
-	r->seq = seq;
-	// cout << "##";
-	// printT(index, seq);
-	sum = calcRouteTravelTimeEndingAt(d, r, index, node);
-	r->seq = NULL;
-	delete r;
 	return sum;
 }
 
 int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int k) {
-	int a, b, i, j, sum, s;
+	int a, b, i, j, sum;
 
-	cout << "calcRouteTravelTimeStartingAt(" << index << ", " << node << " )\n";
-	cout << "[";
-	for (i = index - 1; r->seq[i] != 0; ++i) {
-		if (i == index - 1) cout << node;
-		else cout << r->seq[i];
-		cout << ", ";
-	}
-	cout << 0 <<"]\n";
-
-	cout << "sum = k = " << k << endl;
 	sum = k;
 	a = index - 1;
 	b = index;
@@ -483,32 +443,26 @@ int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int 
 		if (b == r->n) j = 0;
 		else j = r->seq[b];
 
-		cout << "sum += w[" << i << "][2] += " << d->windows[i][2] << " = ";
 		sum += d->windows[i][2];
-		cout << sum << endl;
 
-		s = d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
-		cout << "[" << i << "] -> " << s <<" -> [" << j << "]\n";
-		cout << "sum += max(" << s << ", " << d->windows[j][0] << ") = ";
-		sum = max(s + sum, d->windows[j][0]);
-		cout << sum << endl;
+		sum += d->t[i][j] * d->f[min(sum, d->windows[0][1] - 1)/60]/1000;
+		sum = max(sum, d->windows[j][0]);
 		++a;++b;
 	} while (j != 0);
-	cout << "\tcalcRouteTravelTimeStartingAt(" << index << ", " << node << ")\n";
 	return sum;
 }
 
 void insertNode(Route *r, int index, int node) {
-	copy(r->seq + index, r->seq + r->n - 1, r->seq + index + 1);
+	copy_backward(r->seq + index, r->seq + r->n - 1, r->seq + r->n);
 	r->seq[index] = node;
 }
 
 void calcRoute(Data *d, Route *r) {
-	int distance, delay, missed, close, k, i, j, a, b, cost;
+	int distance, delay, missed, close, k, i, j, a, b;
 
-	distance = delay = missed = cost = 0;
+	distance = delay = missed = 0;
 	k = r->k;
-	a = - 1;
+	a = -1;
 	b = 0;
 	do {
 		if (a == -1) i = 0;
@@ -518,7 +472,8 @@ void calcRoute(Data *d, Route *r) {
 		else j = r->seq[b];
 
 		k += d->windows[i][2];
-		k += max(d->t[i][j] * d->f[min(k, d->windows[0][1])/60 - 1]/1000, d->windows[j][0]);
+		k += d->t[i][j] * d->f[min(k, d->windows[0][1] - 1)/60]/1000;
+		k = max(k, d->windows[j][0]);
 		distance += d->dist[i][j];
 		close = d->windows[j][1];
 		if (k > close) {
@@ -537,7 +492,7 @@ void calcRoute(Data *d, Route *r) {
 }
 
 long calcRouteCost(Route *r) {
-	long cost =  KOSZT_GODZINA * min(r->workHours, GODZINY_PRACY) +
+	long cost = KOSZT_GODZINA * min(r->workHours, GODZINY_PRACY) +
 		NADGODZINA_KOSZT * max(0, r->workHours - GODZINY_PRACY) +
 		DROGA_KOSZT * r->distance + 
 		KOSZT_SPOZNIENIA * r->delay +
