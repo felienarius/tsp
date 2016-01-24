@@ -1,6 +1,7 @@
-// graph.cpp
+// Graph.cpp
 #include "Node.cpp"
 #include "Arc.cpp"
+#include "Data.cpp"
 
 class Graph {
 private:
@@ -9,16 +10,14 @@ private:
 	vector<Arc> arcs;
 
 public:
-	~Graph() { clearGraph(); }
-	Graph(int vertexCount, int v = 0) {
+	Graph(int vertexCount = 0, int v = 0) {
 		n = vertexCount;
 		for (int i = 0; i < v; ++i) addNode(i);
-	};
-	void clearGraph(){
+	}
+	~Graph() {
 		while (!arcs.empty()) arcs.pop_back();
 		while (!nodes.empty()) nodes.pop_back();
 	}
-
 	int getN() { return n; }
 	int getNodeOpen(int i, int k = 0) {
 		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
@@ -36,10 +35,12 @@ public:
 		}
 		return -1;
 	}
+	int getNodesCount() { return nodes.size(); }
+	int getArcsCount() { return arcs.size(); }
 
 	/* get distance between Node i and Node j (in that order) */
 	int getArcDist(int i, int j, int k = 0) {
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
 			if (it->start == i  &&  it->end == j  &&  it->k ==k)
 				return it->dist;
 		}
@@ -48,20 +49,26 @@ public:
 	/* get travel time between Node i and Node j (starting at ) */
 	int getArcTravelTime(int i, int j, int k = 0) {
 		// @TODO add time dependency
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it){
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
 			if (it->start == i  &&  it->end == j  &&  it->k ==k)
 				return it->t;
 		}
 		return 0;
 	}
-
 	void addNode(int i, int k = 0) {
 		Node* node = new Node(i, k);
+		nodes.push_back(*node);
+	}
+	void addNode(int i, int open, int close, int service, int k = 0) {
+		Node* node = new Node(i, open, close, service, k);
 		nodes.push_back(*node);
 	}
 	void addArc(int i, int j, int dist, int travel = 0, int k = 0) {
 		Arc* arc = new Arc(i, j, dist, travel, k);
 		arcs.push_back(*arc);
+		// for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+		// 	if (it->i == i && it->k == k)
+		// 		it->addOutgoingArc(j);
 	}
 
 	void removeNode(int i, int k) {
@@ -86,37 +93,42 @@ public:
 			if (it->end == i) arcs.erase(it);
 		}
 	}
-
-	void setTimeWindow(int i, int open, int close, int service) {
-		for (vector<Node>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-			if (it->i == i){
-				it->open = open;
-				it->close = close;
-				it->service = service;
-				return;
-			}
-		}
-	}
-
 	void setArcTravelTime(int i, int j, int t) {
 		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
-			if (it->start == i  &&  it->end == j){
+			if (it->start == i  &&  it->end == j) {
 				it->t = t;
-				return;
+				break;
 			}
 		}
 	}
-
+	void loadData(Data *d) {
+		int i, j;
+		vector<Node>::reverse_iterator it;
+		n = d->n;
+		for (i = 0; i < d->n; ++i) {
+			addNode(i, d->windows[i][0], d->windows[i][1], d->windows[i][2]);
+			it = nodes.rbegin();
+			for (j = 0; j < d->n; ++j) {
+				if (i == j) continue;
+				addArc(i, j, d->dist[i][j], d->t[i][j]);
+				it->addOutgoingArc(j);
+			}
+		}
+	}
 
 	/* adds Node with all possible time instances */
 	void crossNodes(Graph* graph) {
-		int i, j, p;
-		for (i = 0; i < n; ++i) {
-			j = graph->getNodeOpen(i);
-			p = graph->getNodeClose(i) + 1;
-			for (; j < p; ++j) {
-				addNode(i, j);
-			}
+		vector<Node>::iterator it;
+		int k, i, open, close, service;
+
+		n = graph->n;
+		for (it = graph->nodes.begin(); it != graph->nodes.end(); ++it) {
+			i = it->i;
+			open = it->open;
+			close = it->close;
+			service = it->service;
+			for (k = open; k <= close; ++k)
+				addNode(i, open, close, service, k);
 		}
 	}
 
@@ -144,8 +156,7 @@ public:
 		i = graph->getNodeOpen(0);
 		p0 = graph->getNodeClose(0); // - i + 1;
 		// k = {0, ... , p0}
-		addNode(-1);
-		setTimeWindow(-1, i, p0, 0);
+		addNode(-1, i, p0, 0);
 		p0 = p0 - i + 1;
 		for (i = 0; i < p0 ; ++i) {
 			j = 0;
@@ -187,7 +198,8 @@ public:
 						k = ait->k;
 					}
 				}
-				if (ait->end == 0 && ait->start == i) addArc(i, -1, ait->dist, ait->t, ait->k);
+				if (ait->end == 0 && ait->start == i)
+					addArc(i, -1, ait->dist, ait->t, ait->k);
 			}
 			addArc(-1, i, dist, mint, k);
 		}
@@ -205,7 +217,7 @@ public:
 					++plus;
 					out = ait->end;
 				}
-				if (ait->end == i  &&  (ait->t + ait->k == k)){
+				if (ait->end == i  &&  (ait->t + ait->k == k)) {
 					++minus;
 					in = ait->start;
 				}
@@ -214,11 +226,10 @@ public:
 				if (plus + minus > 0) removeArcsOfNode(i, k);
 				removeNode(i, k);
 			} else if (plus == 1 && out == -1) {
-				if (minus == 1 && in == -1){
+				if (minus == 1 && in == -1) {
 					removeArcsOfNode(i, k);
 					removeNode(i, k);
-				} else
-				if (minus >= 1) {
+				} else if (minus >= 1) {
 					for (j = 0; j < n; ++j) {
 						if (j == i) continue;
 						if (graph->getNodeOpen(j) >= nit->open + k - 1) {
@@ -241,21 +252,33 @@ public:
 			it->print();
 	}
 	void printArcs() {
-		int i, check;
+		vector<Arc>::iterator it;
+		bool any;
+		int i;
+
 		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
 		if (!arcs.empty()) {
 			cout << "A(i, j)[dist, time, k]\n";
-		}
-		for (i = 0; i < n; ++i) {
-			for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it)
-				if(it->start == i)
-					it->print();
-			cout<<endl;
+			for (i = -1; i < n; ++i) {
+				any = false;
+				for (it = arcs.begin(); it != arcs.end(); ++it)
+					if(it->start == i) {
+						it->print();
+						cout << endl;
+						any = true;
+					}
+				if (any) cout << endl;
+			}
 		}
 	}
-	void print(){
+	void print() {
 		cout<<"Graph(" << n << ")\n";
 		printNodes();
 		printArcs();
+	}
+	void printShort() {
+		cout<<"Graph(" << n << ")\n";
+		cout<<"\tNodes("<<nodes.size()<<"):"<<endl;
+		cout<<"\tArcs("<<arcs.size()<<"):"<<endl;
 	}
 };

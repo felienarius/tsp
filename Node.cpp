@@ -12,37 +12,39 @@ public:
 	int service;
 	int k;
 	vector<int> outputs;
-	vector<int> inputs;
-	~Node(){
-		while(!outputs.empty()) outputs.pop_back();
-	}
-	Node () {
-		i = open = close = service = k = 0;
-	}
-	Node(int a){
- 		i = a;
-		open = close = service = k = 0; }
-	// Node(int a, int b){ Node(a, 0, 0, 0); t = b; }
-	Node(int a, int kk){
- 		i = a;
- 		k = kk;
+
+	Node(int a = 0, int kk = 0) {
+		i = a;
+		k = k;
 		open = close = service = 0;
 	}
-	Node(int a, int b, int c, int d = 0, int kk = 0){
+	Node(int a, int b, int c, int d = 0, int kk = 0) {
 		i = a;
 		open = b;
 		close = c;
 		service = d;
 		k = kk;
 	}
-	// void setTime(int nt){ t = nt; }
-	void addOutput(int a){ outputs.push_back(a); }
+	~Node() { while(!outputs.empty()) outputs.pop_back(); }
+	void addOutgoingArc(int a) {
+		outputs.push_back(a); 
+	}
 	void print() {
+		
 		cout<<"N("<<i<<", "<<k<<") ["
 			<<open<<", "
 			<<close<<", "
 			<<service
-			<<"]"<<endl;
+			<<"]";
+		if (!outputs.empty()) {
+			cout << " {";
+			for (vector<int>::iterator it = outputs.begin(); it != outputs.end(); ++it) {
+				if (it != outputs.begin()) cout << " ";
+					cout << *it;
+			}
+			cout << "}";
+		}
+		cout << endl;
 	}
 	void printT(){ cout<<"N("<<i<<") ["<<k<<"]"<<endl; }
 };

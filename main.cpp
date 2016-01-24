@@ -7,62 +7,19 @@
 #include <string>
 #include "Graph.cpp"
 #include "vns.cpp"
+#include "bb.cpp"
+#include "Route.cpp"
 
 using namespace std;
-
-struct Data {
-	int n;
-	int **dist;
-	int **t;
-	int **windows;
-	int *f;
-	Data(int nn = 1) {
-		n = nn;
-	}
-	~Data() {
-		for (int i = 0; i < n; ++i) {
-			delete []dist[i];
-			delete []t[i];
-			delete []windows[i];
-		}
-		delete []dist;
-		delete []t;
-		delete []windows;
-		delete []f;
-	}
-};
-
-struct Route {
-	int n;
-	int k;
-	long cost;
-	int distance;
-	int travelTime;
-	int workHours;
-	int delay;
-	int missed;
-	int *seq;
-	Route(int a = 0) {
-		n = a;
-		cost = 0L;
-		k = distance = travelTime = workHours = delay = missed = 0;
-	}
-	~Route() {
-		delete []seq;
-	}
-};
 
 int GODZINY_PRACY = 10;
 int MAX_DELAY = 15;
 double KOSZT_GODZINA = 15;
 double NADGODZINA_KOSZT = 30;
 double DROGA_KOSZT = 0.4;
-double KOSZT_SPOZNIENIA = 0.5;
+double KOSZT_SPOZNIENIA = 1.0;
 double KOSZT_NIEDOSTARCZENIA = 20; /*per node*/
 
-void loadDistances(Graph *g, int n, int **dist);
-void loadTimeWindows(Graph *g, int n, int **windows);
-void loadTravelTimes(Graph *g, int n, int **times);
 Graph *firstAuxiliaryGraph(Graph *g);
 
 int loadATSP(string name, int ***dist);
@@ -75,104 +32,70 @@ void printData(Data *d);
 void printRoute(Route *r);
 
 Route *search(Data *d, int neighborhoods, int max_no_improv, int max_no_improv_ls);
-/* funcion set for first route */
 Route *firstRoute(Data *d);
 int *sortTimeWindows(int n, int **win);
 int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node);
-// int calcRouteTravelTimeEndingAt(Data *d, int *seq, int index, int node);
 int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int k);
 void insertNode(Route *r, int index, int node);
 
 void calcRoute(Data *d, Route *r);
 long calcRouteCost(Route *r);
+void stochastic_two_opt(Route *r);
+void local_search(Data *d, Route *best, int max_no_improv, int nhood);
+int calcBestStartTime(Data *d, Route *route);
 
 int main() {
 	int workHours = 12;
 	Data *d;
 	Route *best;
-	string pliki[13] = {"br17", "ft53", "ft70", "ftv33", "ftv35", "ftv38",
-	 "ftv44", "ftv47", "ftv55", "ftv64", "ftv70", "p43", "ry48p"};
+	string pliki[13] = {"br17", "ftv33", "ftv35", "ftv38", "p43", "ftv44",
+		"ftv47", "ry48p", "ft53", "ftv55", "ftv64", "ftv70", "ft70"};
 	
 	d = new Data();
 	d->n = loadATSP(pliki[0], &(d->dist));
 	d->t = calcTimeTravel(d->n, d->dist, workHours * 60);
 	d->windows = generateTimeWindows(d->n, workHours * 60, 10);
-	d->f = generateHourMultipler(workHours);
-	printData(d);
+	d->f = generateHourMultipler(workHours, 20);
+	// printData(d);
 	
-	int max_no_improv = 10;
-	int max_no_improv_ls = 5;
-	int neighborhoods = 3;
-	// best = new Route();
-	best = search(d, neighborhoods, max_no_improv, max_no_improv_ls);
-	printRoute(best);
-	// printTab(d->n - 1, best->seq);
-	// cout<<"Done. Best Solution: c="<<best[CITIES]<<", v=";
-	// for(int i=0; i<CITIES-1; ++i)
-	// 	cout<<best[i]<<", ";
-	// cout<<best[CITIES-1];
-	// return 0;
+	// int max_no_improv = 1000;
+	// int max_no_improv_ls = 150;
+	// int neighborhoods = min(d->n - 2, 22);
 
-
-
+	// best = search(d, neighborhoods, max_no_improv, max_no_improv_ls);
+	// printRoute(best);
 
 	// int n = 6; // liczba wierzchołków
-	// Graph* dg = new Graph(n, 6);
-	// Graph* tg;
+	Graph* dg = new Graph();
+	Graph* tg;
 
-	// loadDistances(dg, n, dist);
-	// generateTimeWindows(dg, 0, 41, 0);
-	// generateTravelTimes(dg, 1, 12);
-	// tg = firstAuxiliaryGraph(dg);
+	dg->loadData(d);
+	tg = firstAuxiliaryGraph(dg);
+	tg->printShort();
+	cout << "Za tym\n";
 	// tg->convertToSecondAuxiliaryGraph(dg);
+	// tg->print();
 
-	// delete dg;
-	// delete tg;
-
-	
-
+	// cout << tg->getArcsCount() << endl;
+	delete tg;
+	delete dg;
+	cout << "Za tym2\n";
 	// delete []best;
 	
 	delete d;
-	delete best;
-
-	cin >> workHours;
+	// delete best;
+	cout << "Za tym3\n";
 	return 0;
 }
 
-
-void loadDistances(Graph* g, int n, int** dist) {
-	int i, j;
-
-	for (i = 0; i < n; ++i)
-		for (j = 0; j < n; ++j) {
-			if (i == j) continue;
-			g->addArc(i, j, dist[i][j]);
-		}
-}
-
-void loadTimeWindows(Graph* g, int n, int** windows) {
-	for (int i = 0; i < n; ++i) {
-		g->setTimeWindow(i, windows[i][0], windows[i][1], windows[i][2]);
-	}
-}
-
-void loadTravelTimes(Graph* g, int n, int** times) {
-	for (int i = 0; i < n; ++i)
-		for (int j = 0; j < n; ++j) {
-			if (i == j) continue;
-			g->setArcTravelTime(i, j, times[i][j]);
-		}
-}
-
-Graph* firstAuxiliaryGraph(Graph *graph){
-	Graph* g = new Graph(graph->getN());
+Graph* firstAuxiliaryGraph(Graph *graph) {
+	Graph* g = new Graph();
 	// vertexes
 	g->crossNodes(graph);
 	// adding arcs
-	g->connectNodes(graph);
+	// g->connectNodes(graph);
 	// adding Depot(-1)
-	g->connectDepot(graph);
+	// g->connectDepot(graph);
 	return g;
 }
 
@@ -185,15 +108,13 @@ int loadATSP(string name, int ***dist) {
 	plik.open((string("atsp/") + name + string(".atsp")).c_str());
 	if (!plik.good()) return 0;
 
-	while (line.find("DIMENSION:")) { plik >> line; }
+	while (line.find("DIMENSION:")) plik >> line;
 	plik >> n;
 	d = new int*[n];
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < n; ++i)
 		d[i] = new int[n];
-	}
-	while (line.find("EDGE_WEIGHT_SECTION")) { // getline (plik, line) ) {//pętla nieskończona
+	while (line.find("EDGE_WEIGHT_SECTION")) // getline (plik, line) ) {//pętla nieskończona
 		plik >> line;
-	}
 	for (i = 0; i < n; ++i)
 		for (j = 0; j < n; ++j)
 			plik >> d[i][j];
@@ -220,6 +141,7 @@ int** calcTimeTravel(int n, int** dist, int max_t) {
 		}
 		sum += s;
 	}
+	cout << "suma w rzędzie " << sum << endl;
 	sum = sum*1/2;
 
 	for (i = 0; i < n; ++i)
@@ -304,49 +226,39 @@ void printRoute(Route *r) {
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
 	int iter, count, i, j;
-	// srand(5);
-	Route *r; //, *last_valid;
-	r = firstRoute(d);
-	calcRoute(d, r);
-	// printT(16, best->seq);
-	// last_valid = new int[n + 3];
-	// calcRoute(d, r);
-	// calcRouteCost(r);
-	// printT(20, best);
-	// iter = count = 0;
-	// do {
-	// 	for (i = 1; i < neigh; ++i) {
-	// 		i = 1;
-	// 		int *candidate = new int[n + 3];
-	// 		copy(&best[0], &best[n + 3], &candidate[0]);
-	// 		cout << "copy " << &best[0] << " " << &candidate[0] << endl;
-	// 		// printT(20, candidate);
-	// 		cout << "#3\n";
-	// 		for (j = 0; j < i; ++j)
-	// 			stochastic_two_opt(n, candidate);
-	// 		cout << "THIS\n";
-	// 		printT(20, candidate);
-	// 		candidate[0] = cost(n, dist, t, win, f, &candidate[1], NULL);
-	// 		cout << "THIS\n";
-	// 		cout << "cost calcd ";
-	// 		printT(20, candidate);
-	// 		// candidate = local_search(n, candidate, dist, t, win, f, last_valid, max_no_improv, i);
-	// 		cout<<" > iteration "<<iter+1<<", neigh="<<i<<", best="<<best[0]<<endl;
-	// 		++iter;
-	// 		if (candidate[0] < best[0]) {
-	// 			count = 0;
-	// 			delete []best;
-	// 			best = candidate;
-	// 			cout<<"New best, restarting neighborhood search."<<endl;
-	// 		} else {
-	// 			++count;
-	// 			delete []candidate;
-	// 		}
-	// 	}
-	// } while (count < max_no_improv);
+	Route *best, *candidate; //, *last_valid;
+	
+	srand(5);
+	best = firstRoute(d);
+	printRoute(best);
+	iter = count = 0;
+	do {
+		for (i = 1; i <= neigh; ++i) {
+			candidate = new Route(best);
+			for (j = 0; j < i; ++j)
+				stochastic_two_opt(candidate);
+			calcRoute(d, candidate);
+			local_search(d, candidate, max_no_improv, i);
+			// cout << " > Iteration " << ++iter << ", neigh = " << i << ", best = " << best->cost << endl;
+			// ++iter;
+			if (candidate->cost < best->cost) {
+				count = 0;
+				delete best;
+				best = candidate;
+				cout << "New best, restarting neighborhood search." << endl;
+				printRoute(best);
+			} else {
+				++count;
+				delete candidate;
+			}
+		}
+	} while (count < max_no_improv);
 
+	calcBestStartTime(d, best);
+	calcRoute(d, best);
+	printRoute(best);
 	// delete []last_valid;
-	return r;
+	return best;
 }
 
 Route *firstRoute(Data *d) {
@@ -385,6 +297,7 @@ Route *firstRoute(Data *d) {
 		++nodes;
 	}
 	delete[] sorted;
+	calcRoute(d, r);
 	return r;
 }
 
@@ -499,4 +412,73 @@ long calcRouteCost(Route *r) {
 		KOSZT_NIEDOSTARCZENIA * r->missed;
 	r->cost = cost;
 	return cost;
+}
+
+void stochastic_two_opt(Route *r) {
+	int index1, index2;
+	int *e = new int[3];
+	index1 = rand() % r->n;
+	index2 = rand() % r->n;
+	e[0] = index1;
+	e[1] = (index1 + 1) % r->n;
+	e[2] = (index1 + r->n - 1) % r->n;
+	while (index2 == e[0] || index2 == e[1] || index2 == e[2])
+		index2 = rand() % r->n;
+	delete []e;
+	if (index1 > index2) {
+		for (;index1 > index2; --index1, ++index2)
+			swap(r->seq[index1], r->seq[index2]);
+	} else {
+		for (;index1 < index2; ++index1, --index2)
+			swap(r->seq[index1], r->seq[index2]);
+	}
+}
+void local_search(Data *d, Route *best, int max_no_improv, int nhood) {
+	int i, count = 0;
+	Route *candidate;
+	do {
+		candidate = new Route(best);
+		for (i = 0; i < nhood; ++i)
+			stochastic_two_opt(candidate);
+		calcRoute(d, candidate);
+		if (candidate->cost < best->cost) {
+			count = 0;
+			delete best;
+			best = candidate;
+		} else {
+			++count;
+			delete candidate;
+		}
+	} while (count < max_no_improv);
+}
+
+int calcBestStartTime(Data *d, Route *route) {
+	int i, close, best, mn, mx;
+	Route *r;
+	r = new Route(route);
+	printRoute(r);
+	cin >> i;
+
+	close = d->windows [route->seq[0]] [1];
+
+	for (i = 0; i <= close; i=i+5) {
+		r->k = i;
+		calcRoute(d, r);
+		if (r->cost < route->cost) {
+			route->k = i;
+			route->cost = r->cost;
+		}
+	}
+	mn = max(best - 4, 0);
+	mx = min(best + 4, close);
+	for (i = mn; i <= mx ; ++i) {
+		r->k = i;
+		calcRoute(d, r);
+		if (r->cost <= route->cost) {
+			route->k = i;
+			route->cost = r->cost;
+		}
+	}
+	delete r;
+	return best;
 }

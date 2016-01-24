@@ -17,8 +17,8 @@ public:
 		t = tt;
 		k = kk;
 	}
-	void print(void) {
+	void print() {
 		cout << "A(" << start << ", " << end << ")["
-			<< dist << ", " << t << ", " << k << "] \t";
+			<< dist << ", " << t << ", " << k << "]";
 	}
 };
