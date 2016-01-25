@@ -1,4 +1,4 @@
-#include <conio.h>
+// #include <conio.h>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -47,7 +47,6 @@ int calcBestStartTime(Data *d, Route *route);
 int main() {
 	int workHours = 12;
 	Data *d;
-	Route *best;
 	string pliki[13] = {"br17", "ftv33", "ftv35", "ftv38", "p43", "ftv44",
 		"ftv47", "ry48p", "ft53", "ftv55", "ftv64", "ftv70", "ft70"};
 	
@@ -73,7 +72,7 @@ int main() {
 	tg = firstAuxiliaryGraph(dg);
 	tg->printShort();
 	cout << "Za tym\n";
-	// tg->convertToSecondAuxiliaryGraph(dg);
+	tg->convertToSecondAuxiliaryGraph(dg);
 	// tg->print();
 
 	// cout << tg->getArcsCount() << endl;
@@ -225,13 +224,13 @@ void printRoute(Route *r) {
 
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
-	int iter, count, i, j;
+	int count, i, j;
 	Route *best, *candidate; //, *last_valid;
 	
 	srand(5);
 	best = firstRoute(d);
 	printRoute(best);
-	iter = count = 0;
+	count = 0;
 	do {
 		for (i = 1; i <= neigh; ++i) {
 			candidate = new Route(best);
@@ -302,7 +301,7 @@ Route *firstRoute(Data *d) {
 }
 
 int *sortTimeWindows(int n, int **win) {
-	int i, j, tmp;
+	int i, j;
 	int *mid = new int[n];
 	int *sort = new int[n];
 	for (i = 0; i < n; ++i) {
