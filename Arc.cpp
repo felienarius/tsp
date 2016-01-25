@@ -17,6 +17,7 @@ public:
 		t = tt;
 		k = kk;
 	}
+	~Arc() {}
 	void print() {
 		cout << "A(" << start << ", " << end << ")["
 			<< dist << ", " << t << ", " << k << "]";

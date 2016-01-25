@@ -9,38 +9,35 @@ public:
 	int i;
 	int open;
 	int close;
-	int service;
 	int k;
 	vector<int> outputs;
 
 	Node(int a = 0, int kk = 0) {
 		i = a;
 		k = k;
-		open = close = service = 0;
+		open = close = 0;
 	}
-	Node(int a, int b, int c, int d = 0, int kk = 0) {
+	Node(int a, int b, int c, int kk = 0) {
 		i = a;
 		open = b;
 		close = c;
-		service = d;
 		k = kk;
 	}
 	~Node() { while(!outputs.empty()) outputs.pop_back(); }
 	void addOutgoingArc(int a) {
-		outputs.push_back(a); 
+		int const out = a;
+		outputs.push_back(out);
 	}
 	void print() {
-		
-		cout<<"N("<<i<<", "<<k<<") ["
-			<<open<<", "
-			<<close<<", "
-			<<service
-			<<"]";
+		cout << "N(" << i << ", " << k << ") ["
+			<< open << ", "
+			<< close << "]";
 		if (!outputs.empty()) {
 			cout << " {";
 			for (vector<int>::iterator it = outputs.begin(); it != outputs.end(); ++it) {
-				if (it != outputs.begin()) cout << " ";
-					cout << *it;
+				if (it != outputs.begin())
+					cout << " ";
+				cout << *it;
 			}
 			cout << "}";
 		}

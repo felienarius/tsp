@@ -1,17 +1,38 @@
 // Branch and Bound bb.cpp
+// #include <conio.h>
 #include <iostream>
 #include <queue>
-#include <conio.h>
+#include "Graph.cpp"
 
 struct BBNode {
 	int cost;
 	int travelTime;
 	vector<int> seq;
+	vector<int> kids;
 	BBNode() {
 		cost = travelTime = 0;
 	}
 	~BBNode() {
 		while (!seq.empty()) seq.pop_back();
+	}
+	void print() {
+		vector<int>::iterator it;
+
+		std::cout << "cost = " << cost << " tt = " << travelTime << endl;
+		if(!seq.empty()) {
+			std::cout << "seq[";
+			for (it = seq.begin(); it != seq.end(); ++it) {
+				std::cout << " " << *it; 
+			}
+			std::cout << " ]\n";
+		}
+		if(!kids.empty()) {
+			std::cout << "kid[";
+			for (it = kids.begin(); it != kids.end(); ++it) {
+				std::cout << " " << *it; 
+			}
+			std::cout << " ]\n";
+		}
 	}
 };
 
@@ -27,18 +48,27 @@ struct CompareBBNodes {
 	}
 };
 
-typedef priority_queue < BBNode, vector < BBNode >, CompareBBNodes > priorityQueue;
+typedef priority_queue < BBNode, vector < BBNode >, CompareBBNodes > PriorityQueue;
 
-void addBBNode( priorityQueue & pq, int cost, int travelTime, vector<int> seq) {
-	BBNode bb;
-	bb.cost = cost;
-	bb.travelTime = travelTime;
-	bb.seq = seq;
-	pq.push(bb);
-}
+// void addBBNode(PriorityQueue &pq, int cost, int travelTime, vector<int> seq, vector<int> kids) {
+// 	bb.cost = cost;
+// 	bb.travelTime = travelTime;
+// 	bb.seq = seq;
+// 	bb.kids = kids;
+// 	pq.push(bb);
+// }
 
-// void 
+void branchAndBound(PriorityQueue &pq, Graph *g) {
+	BBNode bb = BBNode();
+	BBNode n;
+	while (!pq.empty()) {
+		BBNode parent;	
+	}
+} 
 
+// void bound(Data *d, vector<int> seq) {
+// 	int 
+// }
 // initialize(Q) //kolejka priorytetowa
 // 	v ← korzeń drzewa //drzewo istnieje niejawnie
 // 	best ← value(v)

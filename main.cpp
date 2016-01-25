@@ -1,16 +1,15 @@
-#include <conio.h>
+// #include <conio.h>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include "Graph.cpp"
 #include "vns.cpp"
 #include "bb.cpp"
 #include "Route.cpp"
 
-using namespace std;
+// using namespace std;
 
 int GODZINY_PRACY = 10;
 int MAX_DELAY = 15;
@@ -18,9 +17,9 @@ double KOSZT_GODZINA = 15;
 double NADGODZINA_KOSZT = 30;
 double DROGA_KOSZT = 0.4;
 double KOSZT_SPOZNIENIA = 1.0;
-double KOSZT_NIEDOSTARCZENIA = 20; /*per node*/
+double KOSZT_NIEDOSTARCZENIA = 20;
 
-Graph *firstAuxiliaryGraph(Graph *g);
+Graph *firstAuxiliaryGraph(Data *d);
 
 int loadATSP(string name, int ***dist);
 int **calcTimeTravel(int n, int **dist, int max_t);
@@ -42,21 +41,24 @@ void calcRoute(Data *d, Route *r);
 long calcRouteCost(Route *r);
 void stochastic_two_opt(Route *r);
 void local_search(Data *d, Route *best, int max_no_improv, int nhood);
-int calcBestStartTime(Data *d, Route *route);
+void calcBestStartTime(Data *d, Route *route);
 
 int main() {
 	int workHours = 12;
 	Data *d;
-	Route *best;
+	BBNode bbn;
+	// Route *best;
 	string pliki[13] = {"br17", "ftv33", "ftv35", "ftv38", "p43", "ftv44",
 		"ftv47", "ry48p", "ft53", "ftv55", "ftv64", "ftv70", "ft70"};
-	
+
+
 	d = new Data();
 	d->n = loadATSP(pliki[0], &(d->dist));
 	d->t = calcTimeTravel(d->n, d->dist, workHours * 60);
 	d->windows = generateTimeWindows(d->n, workHours * 60, 10);
 	d->f = generateHourMultipler(workHours, 20);
 	// printData(d);
+	cout << "Hue hue\n";
 	
 	// int max_no_improv = 1000;
 	// int max_no_improv_ls = 150;
@@ -66,36 +68,39 @@ int main() {
 	// printRoute(best);
 
 	// int n = 6; // liczba wierzchołków
-	Graph* dg = new Graph();
+	// Graph* dg = new Graph();
 	Graph* tg;
 
-	dg->loadData(d);
-	tg = firstAuxiliaryGraph(dg);
+	// dg->loadData(d);
+	tg = firstAuxiliaryGraph(d);
+	// cout << "Za tym\n";
 	tg->printShort();
-	cout << "Za tym\n";
-	// tg->convertToSecondAuxiliaryGraph(dg);
+	// cout << "Za tym2\n";
+	tg->convertToSecondAuxiliaryGraph(d);
+	// cout << "Za tym3\n";
+	// tg->printShort();
 	// tg->print();
+	// PriorityQueue pq;
+	// branchAndBound(pq, tg);
 
 	// cout << tg->getArcsCount() << endl;
 	delete tg;
-	delete dg;
-	cout << "Za tym2\n";
+	// delete dg;
 	// delete []best;
 	
 	delete d;
 	// delete best;
-	cout << "Za tym3\n";
 	return 0;
 }
 
-Graph* firstAuxiliaryGraph(Graph *graph) {
+Graph* firstAuxiliaryGraph(Data *d) {
 	Graph* g = new Graph();
 	// vertexes
-	g->crossNodes(graph);
+	g->crossNodes(d);
 	// adding arcs
-	// g->connectNodes(graph);
+	g->connectNodes(d);
 	// adding Depot(-1)
-	// g->connectDepot(graph);
+	g->connectDepot(d);
 	return g;
 }
 
@@ -225,13 +230,13 @@ void printRoute(Route *r) {
 
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
-	int iter, count, i, j;
+	int count, i, j;
 	Route *best, *candidate; //, *last_valid;
 	
 	srand(5);
 	best = firstRoute(d);
 	printRoute(best);
-	iter = count = 0;
+	count = 0;
 	do {
 		for (i = 1; i <= neigh; ++i) {
 			candidate = new Route(best);
@@ -302,7 +307,7 @@ Route *firstRoute(Data *d) {
 }
 
 int *sortTimeWindows(int n, int **win) {
-	int i, j, tmp;
+	int i, j;
 	int *mid = new int[n];
 	int *sort = new int[n];
 	for (i = 0; i < n; ++i) {
@@ -452,8 +457,8 @@ void local_search(Data *d, Route *best, int max_no_improv, int nhood) {
 	} while (count < max_no_improv);
 }
 
-int calcBestStartTime(Data *d, Route *route) {
-	int i, close, best, mn, mx;
+void calcBestStartTime(Data *d, Route *route) {
+	int i, close, mn, mx;
 	Route *r;
 	r = new Route(route);
 	printRoute(r);
@@ -469,8 +474,8 @@ int calcBestStartTime(Data *d, Route *route) {
 			route->cost = r->cost;
 		}
 	}
-	mn = max(best - 4, 0);
-	mx = min(best + 4, close);
+	mn = max(route->k - 4, 0);
+	mx = min(route->k + 4, close);
 	for (i = mn; i <= mx ; ++i) {
 		r->k = i;
 		calcRoute(d, r);
@@ -480,5 +485,4 @@ int calcBestStartTime(Data *d, Route *route) {
 		}
 	}
 	delete r;
-	return best;
 }

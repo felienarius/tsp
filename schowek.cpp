@@ -1,30 +1,24 @@
 #include <iostream>
 // #include <algorithm>
+#include <vector>
+#include "Arc.cpp"
 using namespace std;
 
 int main()
 {
-	int n = 9;
-	int i = 8;
-	int node = -1;
-	int a[9] = {1,2,3,4,5,6,7,8};
-	int b[9] = {9,8,7,6,5,4,3,2,1};
-	// int sum = 155565;
-	cout << &node << endl;
-	cout << &b[i] << " " << b[i] << endl;
-	cout << &b[n] << " " << b[n] << endl;
-	copy(b+i, b+n-1, b+i+1);
-	b[i] = node;
-	cout << "copy\n" << &b[i] << " " << b[i] << endl;
-	cout << &b[n] << " " << b[n] << endl;
-	cout << b+i+1 << " " << *(b+i+1) << endl;
-
-	for (int i = 0; i < n; ++i)
-	{
-    	cout << b[i] << endl; 
-		/* code */
+	vector<Arc> arcs;
+	for (int i = 0; i < 167000; ++i) {
+		// vector<Node>::iterator it;
+		
+		Arc arc = Arc(i, 5, 33, 876345, 33);
+		arcs.push_back(arc);
+		// for (it = nodes.begin(); it != nodes.end(); ++it)
+		// 	if (it->i == i && it->k == k) {
+		// 		it->addOutgoingArc(j);
+		// 		break;
+		// 	}
 	}
-    // a = min(sum, 720) /60;
+	return 0;
 }
 
 // br17: 39
