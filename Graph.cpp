@@ -56,12 +56,10 @@ public:
 		return 0;
 	}
 	void addNode(int i, int k = 0) {
-		Node* node = new Node(i, k);
-		nodes.push_back(*node);
+		nodes.push_back(Node(i, k));
 	}
 	void addNode(int i, int open, int close, int service, int k = 0) {
-		Node* node = new Node(i, open, close, service, k);
-		nodes.push_back(*node);
+		nodes.push_back(Node(i, open, close, service,k));
 	}
 	void addArc(int i, int j, int dist, int travel = 0, int k = 0) {
 		Arc* arc = new Arc(i, j, dist, travel, k);
@@ -82,9 +80,19 @@ public:
 
 	// @TODO remove links to other nodes than removing one
 	void removeArcsOfNode(int i, int k) {
-		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
-			if (it->start == i  &&  it->k == k) arcs.erase(it);
-			if (it->end == i  &&  (it->t + it->start == k)) arcs.erase(it);
+		for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end();) {
+      bool removed = false;
+			if (it->start == i  &&  it->k == k) {
+        it = arcs.erase(it);
+        removed = true;
+      }
+			if (it->end == i  &&  (it->t + it->start == k)) { 
+        it = arcs.erase(it);
+        removed = true;
+      }
+      if (!removed) {
+        ++it;
+      }
 		}
 	}
 	void removeArcsOfNode(int i) {
@@ -181,10 +189,12 @@ public:
 		vector<Arc>::iterator ait;
 
 		// removing nodes v0s' and v0e'
-		for (nit = nodes.begin(); nit != nodes.end(); ++nit)
+		for (nit = nodes.begin(); nit != nodes.end();)
 			if (nit->i == 0) {
-				nodes.erase(nit);
-			}
+				nit = nodes.erase(nit);
+			} else {
+        ++nit;
+      }
 		
 		// moving arcs from v0(0) to vd(-1) 
 		mint = -1;
@@ -208,8 +218,13 @@ public:
 
 		// redukcja zbędnych wierzchołków
 		mint = getNodeOpen(-1);
-		for (nit = nodes.begin(); nit != nodes.end(); ++nit) {
+    // TODO(pawel) popraw tę pętlę, bo zmieniasz nodes w jej środku (removeNode),
+    // więc miałeś segfaulta, gdyż wtedy iterator staje się nieważny. Teraz nie
+    // masz segfaulta, ale za to takie przechodzenie przez idx może nie mieć
+    // sensu.
+		for (size_t idx = 0; idx < nodes.size(); ++idx) {
 			plus = minus = 0;
+      Node* nit = &nodes[idx];
 			i = nit->i;
 			k = nit->k;
 			for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
