@@ -1,47 +1,4 @@
-// #include <conio.h>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include "vns.cpp"
-#include "bb.cpp"
-#include "Route.cpp"
-
-// using namespace std;
-
-const int GODZINY_PRACY = 10;
-const int MAX_DELAY = 15;
-const double KOSZT_GODZINA = 15;
-const double NADGODZINA_KOSZT = 30;
-const double DROGA_KOSZT = 0.4;
-const double KOSZT_SPOZNIENIA = 1.0;
-const double KOSZT_NIEDOSTARCZENIA = 20;
-
-Graph *firstAuxiliaryGraph(Data *d);
-
-int loadATSP(string name, int ***dist);
-int **calcTimeTravel(int n, int **dist, int max_t);
-int **generateTimeWindows(int n, int close, int maxService, int seed = 5);
-int *generateHourMultipler(int n, int variation = 15, int seed = 5);
-void printTab(int n, int m, int **t);
-void printTab(int n, int *t);
-void printData(Data *d);
-void printRoute(Route *r);
-
-Route *search(Data *d, int neighborhoods, int max_no_improv, int max_no_improv_ls);
-Route *firstRoute(Data *d);
-int *sortTimeWindows(int n, int **win);
-int calcRouteTravelTimeEndingAt(Data *d, Route *r, int index, int node);
-int calcRouteTravelTimeStartingAt(Data *d, Route *r, int index , int node , int k);
-void insertNode(Route *r, int index, int node);
-
-void calcRoute(Data *d, Route *r);
-long calcRouteCost(Route *r);
-void stochastic_two_opt(Route *r);
-void local_search(Data *d, Route *best, int max_no_improv, int nhood);
-void calcBestStartTime(Data *d, Route *route);
+#include "main.h"
 
 int main() {
   int workHours = 12;
@@ -55,34 +12,30 @@ int main() {
   d->t = calcTimeTravel(d->n, d->dist, workHours * 60);
   d->windows = generateTimeWindows(d->n, workHours * 60, 10);
   d->f = generateHourMultipler(workHours, 20);
-  // printData(d);
   
-  // int max_no_improv = 1000;
-  // int max_no_improv_ls = 150;
-  // int neighborhoods = min(d->n - 2, 22);
-
-  // best = search(d, neighborhoods, max_no_improv, max_no_improv_ls);
-  // printRoute(best);
+  int max_no_improv = 1000;
+  int max_no_improv_ls = 150;
+  int neighborhoods = min(d->n - 2, 22);
+  Route *best;
+  best = search(d, neighborhoods, max_no_improv, max_no_improv_ls);
+  printRoute(best);
 
   // int n = 6; // liczba wierzchołków
   // Graph* dg = new Graph();
-  Graph* tg;
+  // Graph* tg;
 
-  // dg->loadData(d);
-  tg = firstAuxiliaryGraph(d);
-  tg->printShort();
-  tg->convertToSecondAuxiliaryGraph(d);
-  tg->printShort();
-  // PriorityQueue pq;
-  // branchAndBound(pq, tg);
+  // tg = firstAuxiliaryGraph(d);
+  // tg->printShort();
+  // tg->convertToSecondAuxiliaryGraph(d);
+  // tg->printShort();
 
-  // cout << tg->getArcsCount() << endl;
-  delete tg;
-  // delete dg;
-  // delete []best;
-  
+  // BranchAndBound bab = BranchAndBound(tg);
+  // bab.work();
+
+  // delete tg;
+  delete best;
   delete d;
-  // delete best;
+
   return 0;
 }
 
@@ -139,7 +92,7 @@ int** calcTimeTravel(int n, int** dist, int max_t) {
     }
     sum += s;
   }
-  cout << "suma w rzędzie " << sum << endl;
+  // cout << "suma w rzędzie " << sum << endl;
   sum = sum*1/2;
 
   for (i = 0; i < n; ++i)
@@ -194,12 +147,14 @@ void printTab(int n, int m, int** t) {
     cout << t[i][j] << "]\n";
   }
 }
+
 void printTab(int n, int *t) {
   int i;
   cout << "[";
   for (i = 0; i < n - 1 ; ++i) cout << t[i] << ", ";
   cout << t[i] << "]\n";
 }
+
 void printData(Data *d) {
   cout << "\tDistances:\n";
   printTab(d->n, d->n, d->dist);
@@ -223,13 +178,13 @@ void printRoute(Route *r) {
 
 
 Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
-  int count, i, j;
+  int count, i, j, iter;
   Route *best, *candidate;
   
-  srand(5);
+  srand(time(0));
   best = firstRoute(d);
   printRoute(best);
-  count = 0;
+  iter = count = 0;
   do {
     for (i = 1; i <= neigh; ++i) {
       candidate = new Route(best);
@@ -237,14 +192,14 @@ Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
         stochastic_two_opt(candidate);
       calcRoute(d, candidate);
       local_search(d, candidate, max_no_improv, i);
-      // cout << " > Iteration " << ++iter << ", neigh = " << i << ", best = " << best->cost << endl;
+      cout << " > Iteration " << ++iter << ", neigh = " << i << ", best = " << best->cost << endl;
       // ++iter;
       if (candidate->cost < best->cost) {
         count = 0;
         delete best;
         best = candidate;
         cout << "New best, restarting neighborhood search." << endl;
-        printRoute(best);
+        // printRoute(best);
       } else {
         ++count;
         delete candidate;
@@ -252,9 +207,9 @@ Route* search(Data *d, int neigh, int max_no_improv, int max_no_improv_ls) {
     }
   } while (count < max_no_improv);
 
-  calcBestStartTime(d, best);
-  calcRoute(d, best);
-  printRoute(best);
+  // calcBestStartTime(d, best);
+  // calcRoute(d, best);
+  // printRoute(best);
   return best;
 }
 

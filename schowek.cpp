@@ -50,6 +50,28 @@ int main()
 // ry48p: 14422
 
 
+// initialize(Q) //kolejka priorytetowa
+//  v ← korzeń drzewa //drzewo istnieje niejawnie
+//  best ← value(v)
+//  best items ← items(v)
+//  insert(Q, v)
+//  while !empty(Q) do
+//    v ← remove(Q)
+//    if bound(v) jest lepszy od best then
+//    for all dziecko u węzła v do
+//      if value(u) jest lepsza od best then
+//        best ← value(u)
+//        best items ← items(u)
+//      end if
+//      if bound(u) jest lepszy od best then
+//        insert(Q, u)
+//      end if
+//    end for
+//  end if
+// end while
+
+
+
 	// // srand(time(0));
 	// //parametry
 	// // godziny pracy, 0 to pierwsza minuta pracy

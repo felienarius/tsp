@@ -16,8 +16,8 @@ public:
       addNode(i);
   }
   ~Graph() {
-    while (!arcs.empty()) arcs.pop_back();
-    while (!nodes.empty()) nodes.pop_back();
+    if (!arcs.empty()) arcs.clear();
+    if (!nodes.empty()) nodes.clear();
   }
   int getN() { return n; }
   int getNodesCount() { return nodes.size(); }
@@ -35,10 +35,10 @@ public:
   int getArcTravelTime(int i, int j, int k = 0) {
     // @TODO add time dependency
     for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
-      if (it->start == i  &&  it->end == j  &&  it->k ==k)
+      if (it->start == i  &&  it->end == j  &&  it->k == k)
         return it->t;
     }
-    return 0;
+    return -1;
   }
   vector<int> getNodeSeq(int i, int k = 0) {
     vector<int> s;
@@ -102,6 +102,17 @@ public:
           break;
         }
     }
+  }
+  int calcTraveledTime(vector<int> v, int k = 0) {
+    int sum;
+    if (v.size() == 0)
+      return 0;
+    sum = getArcTravelTime(0, v[0], k);
+
+    for (unsigned int i = 1; i < v.size(); ++i)
+      sum += getArcTravelTime(v[i - 1], v[i], sum);
+
+    return sum;
   }
   void setArcTravelTime(int i, int j, int t) {
     for (vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
@@ -213,9 +224,10 @@ public:
       }
       addArc(-1, i, dist, mint, k);
     }
-    for (ait = arcs.begin(); ait != arcs.end(); ++ait)
-      if (ait->end == 0 && ait->start == i)
-        addArc(i, -1, ait->dist, ait->t, ait->k);
+    mint = arcs.size();
+    for (i = 0; i < mint; ++i)
+      if (arcs[i].end == 0)
+        addArc(arcs[i].start, -1, arcs[i].dist, arcs[i].t, arcs[i].k);
     
     // removing left arcs
     removeArcsOfNode(0);

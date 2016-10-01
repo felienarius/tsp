@@ -23,7 +23,7 @@ public:
     close = c;
     k = kk;
   }
-  ~Node() { while(!outputs.empty()) outputs.pop_back(); }
+  ~Node() { if(!outputs.empty()) outputs.clear(); }
   void addOutgoingArc(int a) {
     outputs.push_back(a);
   }
