@@ -1,0 +1,14 @@
+{
+    "folders": [{"path": "."}],
+    "folder_exclude_patterns": ["git"],
+    "file_exclude_patterns": ["*.sublime-workspace"],
+    "tab_size": 2,
+    "translate_tabs_to_spaces": true,
+    "build_systems":
+    [
+        {
+            "name": "Build",
+            "shell_cmd": "g++ -std=c++11 \"/home/bkr/github/tsp/src/main.cpp\" -o \"/home/bkr/github/tsp/main\" && /home/bkr/github/tsp/main"
+        }
+    ]
+}

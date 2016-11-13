@@ -152,10 +152,3 @@ void BranchAndBound::work() {
 //    end for
 //  end if
 // end while
-
-
-// 36 x 5gr
-// 78 x 1gr
-// 40 x 2gr
-// +30zl
-// 199gr

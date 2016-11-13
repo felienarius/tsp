@@ -165,6 +165,7 @@ void printData(Data *d) {
   cout << "\tHourMultipler:\n";
   printTab(d->windows[0][1]/60, d->f);
 }
+
 void printRoute(Route *r) {
   cout << "\tRoute seq(" << r->n << ", " << r->k << "):\n";
   printTab(r->n, r->seq);
