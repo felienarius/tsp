@@ -12,13 +12,13 @@ class Config {
 private:
   unsigned int index;
   unsigned int vertexCount = 0;
-  unsigned int workHours = 12;
+  unsigned int workHours = 4;
   unsigned int SEED = 5555;
   vector<vector<unsigned int>> distances; // n x n
   vector<vector<unsigned int>> times; // n x n
   vector<vector<unsigned int>> windows; // n x 3
   vector<unsigned int> timeDependency; // 12 x 1
-  string pliki[13] = { "br17", "ftv33", "ftv35", "ftv38", "p43",
+  string pliki[14] = {"pp5", "br17", "ftv33", "ftv35", "ftv38", "p43",
     "ftv44", "ftv47", "ry48p", "ft53", "ftv55", "ftv64", "ftv70",
     "ft70" };
   void printVector(vector<vector<unsigned int>> vector);
@@ -32,6 +32,7 @@ public:
   void generateTimeWindows();
   void generateTimeDependency(unsigned int variation);
   void print();
+  unsigned int getVertexCount();
   vector<vector<unsigned int>> getDistances();
   vector<vector<unsigned int>> getTimes();
   vector<vector<unsigned int>> getWindows();
@@ -180,6 +181,10 @@ void Config::print() {
   printTimeWindowsAverage();
   cout << "\tTimeDependency:\n";
   printVector(timeDependency);
+}
+
+unsigned int Config::getVertexCount() {
+  return vertexCount;
 }
 
 vector<vector<unsigned int>> Config::getDistances() {

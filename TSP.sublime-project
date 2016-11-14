@@ -9,6 +9,10 @@
         {
             "name": "Build",
             "shell_cmd": "g++ -std=c++11 \"/home/bkr/github/tsp/src/main.cpp\" -o \"/home/bkr/github/tsp/main\" && /home/bkr/github/tsp/main"
+        },
+        {
+            "name": "Build-WIN10",
+            "shell_cmd": "g++ -std=c++11 \"C:\\Users\\pawel\\Documents\\GitHub\\tsp\\src\\main.cpp\" -o \"C:\\Users\\pawel\\Documents\\GitHub\\tsp\\main.exe\" && C:\\Users\\pawel\\Documents\\GitHub\\tsp\\main.exe"
         }
     ]
 }
