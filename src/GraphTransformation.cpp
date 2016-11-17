@@ -30,6 +30,7 @@ private:
   void loadNodes();
   void loadArcs();
   void connectDepot();
+  void removeArcsOfNode(int index);
 public:
   GraphTransformation();
   void load(shared_ptr<Config> config);
@@ -147,9 +148,9 @@ void GraphTransformation::secondAuxiliaryGraph() {
   }
 
   mint = arcs.size();
-  for (i = 0; i < mint; ++i)
-    if (arcs[i].end == 0)
-      addArc(arcs[i].start, DEPOT_INDEX, arcs[i].dist, arcs[i].t, arcs[i].k);
+  for (ait = arcs.begin(); ait != arcs.end(); ++ait)
+    if (ait->getEnd() == 0)
+      graph->addArc(ait->getStart(), DEPOT_INDEX, ait->getDistance(), ait->getTime(), ait->getTimeInstance());
   
   // removing left arcs
   removeArcsOfNode(0);
@@ -159,7 +160,7 @@ void GraphTransformation::secondAuxiliaryGraph() {
   // masz segfaulta, ale za to takie przechodzenie przez idx może nie mieć
   // sensu.
   // redukcja zbędnych wierzchołków
-  mint = d->windows[0][0];
+  mint = config->getWindows()[0][0];
   for (size_t idx = 0; idx < nodes.size(); ++idx) {
     plus = minus = 0;
     Node* nit = &nodes[idx];
@@ -192,5 +193,14 @@ void GraphTransformation::secondAuxiliaryGraph() {
         }
       }
     }
+  }
+}
+
+void GraphTransformation::removeArcsOfNode(int index) {
+  for (set<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+    if (it->getStart() == index || it->getEnd() == index)
+      arcs.erase(it++);
+    else
+      ++it;
   }
 }
