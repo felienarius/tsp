@@ -8,7 +8,6 @@
 #include <algorithm>
 #include "Config.cpp"
 
-using std::ifstream;
 using std::string;
 using std::vector;
 using std::set;
@@ -21,8 +20,8 @@ using std::unique_ptr;
 using std::shared_ptr;
 
 class GraphTransformation {
-private:
-  const unsigned int DEPOT_INDEX = 4294967295;
+ private:
+  const unsigned int DEPOT_INDEX = -1;
   shared_ptr<Config> config;
   unique_ptr<Graph> graph;
   set<Node> nodes;
@@ -30,8 +29,9 @@ private:
   void loadNodes();
   void loadArcs();
   void connectDepot();
-  void removeArcsOfNode(int index);
-public:
+  void removeArcsOfNode(unsigned int index);
+  void removeArcsOfNode(unsigned int index, unsigned int timeInstance);
+ public:
   GraphTransformation();
   void load(shared_ptr<Config> config);
   void firstAuxiliaryGraph();
@@ -49,26 +49,24 @@ void GraphTransformation::load(shared_ptr<Config> config) {
 void GraphTransformation::firstAuxiliaryGraph() {
   assert(graph->getNodesCount() == 0);
   loadNodes();
-  cout << "Nodes: " << graph->getNodesCount() << endl;
   assert(graph->getNodesCount() != 0);
 
   assert(graph->getArcsCount() == 0);
   loadArcs();
-  cout << "Arcs: " << graph->getArcsCount() << endl;
   assert(graph->getArcsCount() != 0);
 
   connectDepot();
-  cout << "Nodes: " << graph->getNodesCount() << endl;
-  cout << "Arcs: " << graph->getArcsCount() << endl;
+  graph->printNodes();
+  graph->printArcs();
 }
 
 void GraphTransformation::loadNodes() {
-  unsigned int k, i, open, close;
-  for (i = 0; i < config->getVertexCount(); ++i) {
-    open = config->getWindows()[i][0];
-    close = config->getWindows()[i][1];
-    for (k = open; k <= close; ++k)
-      graph->addNode(i, open, close, k);
+  unsigned int index, timeInstance, open, close;
+  for (index = 0; index < config->getVertexCount(); ++index) {
+    open = config->getWindows()[index][0];
+    close = config->getWindows()[index][1];
+    for (timeInstance = open; timeInstance <= close; ++timeInstance)
+      graph->addNode(index, timeInstance, open, close);
   }
 }
 
@@ -86,7 +84,7 @@ void GraphTransformation::loadArcs() {
       if (i != j) {
         travel = config->getTimes()[i][j] * config->getTimeDependency()[min(k, max_time)/60] / 1000;
         if (vj->getTimeInstance() == max(config->getWindows()[j][0], k + travel)) {
-          graph->addArc(i, j, config->getDistances()[i][j], travel, k);
+          graph->addArc(*vi, *vj, config->getDistances()[i][j], travel);
         }
       }
     }
@@ -108,11 +106,11 @@ void GraphTransformation::connectDepot() {
     for (it = arcs.begin(); it != arcs.end(); ++it) {
       if (!(j & 1) && (it->getStart() == 0) && (it->getTimeInstance() == i)) { // wychodzący
         j = j|1;
-        graph->addArc(DEPOT_INDEX, 0, 0, 0, i);
+        graph->addArc(DEPOT_INDEX, 0, 0, 0);
       }
       if (!(j & 2) && (it->getEnd() == 0) && (it->getTimeInstance() == i)) { // wchodzący
         j = j|2;
-        graph->addArc(0, DEPOT_INDEX, 0, 0, i);
+        graph->addArc(0, DEPOT_INDEX, 0, 0);
       }
     }
     if (j == 0) graph->removeNode(0, i); // usunięcie
@@ -121,9 +119,10 @@ void GraphTransformation::connectDepot() {
 
 /* reduces near Depot nodes and arcs */
 void GraphTransformation::secondAuxiliaryGraph() {
-  int i, j, k, mint, dist, plus, minus, in, out;
+  unsigned int index, j, timeInstance, mint, dist, plus, minus, in, out;
   set<Node>::iterator nit;
   set<Arc>::iterator ait;
+
   // removing nodes v0s' and v0e'
   for (nit = nodes.begin(); nit != nodes.end();)
     if (nit->getIndex() == 0)
@@ -132,25 +131,22 @@ void GraphTransformation::secondAuxiliaryGraph() {
       ++nit;
   
   // moving arcs from v0(0) to vd(DEPOT_INDEX) 
-  mint = -1;
-  k = -1;
-  for (i = 1; i < config->getVertexCount(); ++i) {
+  mint = DEPOT_INDEX;
+  for (index = 1; index < config->getVertexCount(); ++index) {
     for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
-      if (ait->getStart() == 0 && ait->getEnd() == i) {
-        if (ait->getTime() < mint  ||  mint == -1) {
+      if (ait->getStart() == 0 && ait->getEnd() == index) {
+        if (ait->getTime() < mint  ||  mint == DEPOT_INDEX) {
           dist = ait->getDistance();
           mint = ait->getTime();
-          k = ait->getTimeInstance();
         }
       }
     }
-    graph->addArc(DEPOT_INDEX, i, dist, mint, k);
+    graph->addArc(DEPOT_INDEX, index, dist, mint);
   }
 
-  mint = arcs.size();
   for (ait = arcs.begin(); ait != arcs.end(); ++ait)
     if (ait->getEnd() == 0)
-      graph->addArc(ait->getStart(), DEPOT_INDEX, ait->getDistance(), ait->getTime(), ait->getTimeInstance());
+      graph->addArc(ait->getStart(), DEPOT_INDEX, ait->getDistance(), ait->getTime());
   
   // removing left arcs
   removeArcsOfNode(0);
@@ -160,46 +156,57 @@ void GraphTransformation::secondAuxiliaryGraph() {
   // masz segfaulta, ale za to takie przechodzenie przez idx może nie mieć
   // sensu.
   // redukcja zbędnych wierzchołków
-  mint = config->getWindows()[0][0];
-  for (size_t idx = 0; idx < nodes.size(); ++idx) {
+  for (nit = nodes.begin(); nit != nodes.end(); ++nit) {
     plus = minus = 0;
-    Node* nit = &nodes[idx];
-    i = nit->i;
-    k = nit->k;
+    index = nit->getIndex();
+    timeInstance = nit->getTimeInstance();
     for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
-      if (ait->start == i  &&  ait->k == k){
+      if (ait->getStart() == index  &&  ait->getTimeInstance() == timeInstance){
         ++plus;
-        out = ait->end;
+        out = ait->getEnd();
       }
-      if (ait->end == i  &&  (ait->t + ait->k == k)) {
+      if (ait->getEnd() == index  &&  (ait->getTime() + ait->getTimeInstance() == timeInstance)) {
         ++minus;
-        in = ait->start;
+        in = ait->getStart();
       }
     }
-    if (plus == 0 || minus == 0){
-      if (plus + minus > 0) removeArcsOfNode(i, k);
-      removeNode(i, k);
+    if (plus == 0 || minus == 0) {
+      if (plus + minus > 0)
+        removeArcsOfNode(index, timeInstance);
+      graph->removeNode(index, timeInstance);
     } else if (plus == 1 && out == DEPOT_INDEX) {
       if (minus == 1 && in == DEPOT_INDEX) {
-        removeArcsOfNode(i, k);
-        removeNode(i, k);
+        removeArcsOfNode(index, timeInstance);
+        graph->removeNode(index, timeInstance);
       } else if (minus >= 1) {
-        for (j = 0; j < n; ++j) {
-          if (j == i) continue;
-          if (d->windows[j][0] >= nit->open + k - 1) {
-            removeArcsOfNode(i, k);
-            removeNode(i, k);
+        for (j = 0; j < config->getVertexCount(); ++j) {
+          if (j == index)
+            continue;
+          if (config->getWindows()[j][0] >= nit->getOpen() + timeInstance - 1) {
+            removeArcsOfNode(index, timeInstance);
+            graph->removeNode(index, timeInstance);
           }
         }
       }
     }
   }
+  // graph->printNodes();
+  // graph->printArcs();
 }
 
-void GraphTransformation::removeArcsOfNode(int index) {
-  for (set<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+void GraphTransformation::removeArcsOfNode(unsigned int index) {
+  for (set<Arc>::iterator it = arcs.begin(); it != arcs.end();) {
     if (it->getStart() == index || it->getEnd() == index)
-      arcs.erase(it++);
+      it = arcs.erase(it);
+    else
+      ++it;
+  }
+}
+
+void GraphTransformation::removeArcsOfNode(unsigned int index, unsigned int timeInstance) {
+  for (set<Arc>::iterator it = arcs.begin(); it != arcs.end();) {
+    if (it->getTimeInstance() == timeInstance && (it->getStart() == index || it->getEnd() == index))
+      it = arcs.erase(it);
     else
       ++it;
   }

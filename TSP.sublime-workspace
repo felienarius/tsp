@@ -4,12 +4,52 @@
 		"selected_items":
 		[
 			[
-				"in",
-				"index"
+				"pr",
+				"printNodes"
+			],
+			[
+				"ti",
+				"timeInstance"
+			],
+			[
+				"end",
+				"endIt"
+			],
+			[
+				"st",
+				"startIt"
+			],
+			[
+				"NODE",
+				"NODE_2"
+			],
+			[
+				"NOD",
+				"NODE_1"
+			],
+			[
+				"NO",
+				"NODE_3"
+			],
+			[
+				"gett",
+				"getTimeInstance"
 			],
 			[
 				"get",
-				"getTimes"
+				"getTimeInstance"
+			],
+			[
+				"no",
+				"node1"
+			],
+			[
+				"f",
+				"find"
+			],
+			[
+				"in",
+				"index"
 			],
 			[
 				"getT",
@@ -22,10 +62,6 @@
 			[
 				"Gra",
 				"GraphTransformation"
-			],
-			[
-				"ti",
-				"time"
 			],
 			[
 				"getTime",
@@ -100,10 +136,6 @@
 				"node2"
 			],
 			[
-				"no",
-				"nodes"
-			],
-			[
 				"ca",
 				"candidate"
 			],
@@ -162,10 +194,6 @@
 			[
 				"w",
 				"windows"
-			],
-			[
-				"pr",
-				"printData"
 			],
 			[
 				"win",
@@ -248,10 +276,6 @@
 				"printTab"
 			],
 			[
-				"st",
-				"start"
-			],
-			[
 				"beg",
 				"begin"
 			],
@@ -303,7 +327,16 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 2107,
+				"buffer_size": 3129,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/Arc.cpp",
+			"settings":
+			{
+				"buffer_size": 1273,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -312,7 +345,7 @@
 			"file": "src/Graph.cpp",
 			"settings":
 			{
-				"buffer_size": 2353,
+				"buffer_size": 2829,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -321,7 +354,7 @@
 			"file": "src/Node.cpp",
 			"settings":
 			{
-				"buffer_size": 1285,
+				"buffer_size": 1525,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -330,7 +363,7 @@
 			"file": "src/GraphTransformation.cpp",
 			"settings":
 			{
-				"buffer_size": 5678,
+				"buffer_size": 6231,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -340,15 +373,6 @@
 			"settings":
 			{
 				"buffer_size": 4909,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/Arc.cpp",
-			"settings":
-			{
-				"buffer_size": 1510,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -527,18 +551,19 @@
 	"expanded_folders":
 	[
 		"/C/Users/pawel/Documents/GitHub/tsp",
-		"/C/Users/pawel/Documents/GitHub/tsp/atsp",
 		"/C/Users/pawel/Documents/GitHub/tsp/src",
 		"/C/Users/pawel/Documents/GitHub/tsp/src_old"
 	],
 	"file_history":
 	[
-		"/C/Users/pawel/Videos/The Secret Life Of Pets (2016) [1080p] [YTS.AG]/The.Secret.Life.Of.Pets.2016.1080p.BluRay.x264-[YTS.AG].txt",
-		"/C/Users/pawel/Documents/GitHub/tsp/src_old/Graph.cpp",
-		"/C/Users/pawel/Documents/GitHub/tsp/atsp/pp5.atsp",
-		"/C/Users/pawel/Documents/GitHub/tsp/src_old/BBNode.cpp",
-		"/C/Users/pawel/Documents/GitHub/tsp/src_old/Data.cpp",
 		"/C/Users/pawel/Documents/GitHub/tsp/TSP.sublime-project",
+		"/C/Users/pawel/Documents/GitHub/tsp/src/main.cpp",
+		"/C/Users/pawel/Documents/GitHub/tsp/src_old/BranchAndBound.cpp",
+		"/C/Users/pawel/Documents/GitHub/tsp/src_old/BBNode.cpp",
+		"/C/Users/pawel/Documents/GitHub/tsp/src_old/Graph.cpp",
+		"/C/Users/pawel/Videos/The Secret Life Of Pets (2016) [1080p] [YTS.AG]/The.Secret.Life.Of.Pets.2016.1080p.BluRay.x264-[YTS.AG].txt",
+		"/C/Users/pawel/Documents/GitHub/tsp/atsp/pp5.atsp",
+		"/C/Users/pawel/Documents/GitHub/tsp/src_old/Data.cpp",
 		"/C/Users/pawel/Desktop/DESKTOP-DH6PND0.txt",
 		"/home/bkr/github/tsp/src/BranchAndBound.cpp",
 		"/home/bkr/github/tsp/gradle/wrapper/gradle-wrapper.properties",
@@ -625,6 +650,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"void",
+			"ait",
+			"eras",
+			"printNodes",
+			"\";",
+			"convertToSecondAuxiliaryGraph",
+			"k",
 			"£",
 			"Ó",
 			"Ÿ",
@@ -670,6 +702,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"aIt",
+			"timeInstance",
 			"Ł",
 			"ó",
 			"ź",
@@ -696,7 +730,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -705,15 +739,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2107,
+						"buffer_size": 3129,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								392,
-								392
+								1420,
+								1420
 							]
 						],
 						"settings":
@@ -723,31 +757,35 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 900.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/Graph.cpp",
+					"file": "src/Arc.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2353,
+						"buffer_size": 1273,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1271,
-								1275
+								628,
+								628
 							]
 						],
 						"settings":
 						{
+							"rulers":
+							[
+								80
+							],
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
@@ -761,49 +799,88 @@
 				},
 				{
 					"buffer": 2,
-					"file": "src/Node.cpp",
+					"file": "src/Graph.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1285,
+						"buffer_size": 2829,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								398,
-								398
+								1291,
+								1295
 							]
 						],
 						"settings":
 						{
+							"rulers":
+							[
+								80
+							],
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": true,
+							"wrap_width": 80
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 240.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/GraphTransformation.cpp",
+					"file": "src/Node.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5678,
+						"buffer_size": 1525,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4952,
-								4952
+								1276,
+								1276
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								80
+							],
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 720.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/GraphTransformation.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6231,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2505,
+								2505
 							]
 						],
 						"settings":
@@ -813,14 +890,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3000.0,
+						"translation.y": 1740.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "src/Config.cpp",
 					"semi_transient": false,
 					"settings":
@@ -832,8 +909,8 @@
 						"selection":
 						[
 							[
-								1593,
-								1604
+								3225,
+								3225
 							]
 						],
 						"settings":
@@ -843,37 +920,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/Arc.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1510,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1428,
-								1428
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2529.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
@@ -882,7 +929,7 @@
 			]
 		},
 		{
-			"selected": 2,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -898,8 +945,8 @@
 						"selection":
 						[
 							[
-								556,
-								562
+								531,
+								531
 							]
 						],
 						"settings":
@@ -909,7 +956,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 120.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 9,
@@ -942,13 +989,13 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
 					"buffer": 8,
 					"file": "src_old/Graph.cpp",
-					"semi_transient": false,
+					"semi_transient": true,
 					"settings":
 					{
 						"buffer_size": 8671,
@@ -958,22 +1005,21 @@
 						"selection":
 						[
 							[
-								7460,
-								7460
+								7710,
+								7710
 							]
 						],
 						"settings":
 						{
-							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4610.0,
+						"translation.y": 5285.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
@@ -989,8 +1035,8 @@
 						"selection":
 						[
 							[
-								147,
-								147
+								329,
+								329
 							]
 						],
 						"settings":
@@ -1002,7 +1048,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -1036,7 +1082,7 @@
 		"cols":
 		[
 			0.0,
-			0.575242718447,
+			0.529733009709,
 			1.0
 		],
 		"rows":
@@ -1048,7 +1094,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 204.0
+		"height": 413.0
 	},
 	"output.find_results":
 	{

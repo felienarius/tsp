@@ -1,48 +1,39 @@
+#include "Node.cpp"
+
 class Arc {
-private:
-  unsigned int start;
-  unsigned int end;
+ private:
+  const Node *start;
+  const Node *end;
   unsigned int distance;
   unsigned int time;
-  unsigned int timeInstance;
-public:
-  Arc(unsigned int start, unsigned int end);
-  Arc(unsigned int start, unsigned int end, unsigned int distance, unsigned int time, unsigned int  timeInstance);
-  bool operator< (const Arc& a) const;
+ public:
+  Arc(const Node &start, const Node &end, unsigned int distance = 0, unsigned int time = 0);
+  bool operator<(const Arc &a) const;
   unsigned int getStart() const;
   unsigned int getEnd() const;
   unsigned int getDistance() const;
   unsigned int getTime() const;
   unsigned int getTimeInstance() const;
-  void setDistance(unsigned int distance);
+  void print() const;
 };
 
-Arc::Arc(unsigned int start, unsigned int end) {
-  this->start = start ;
-  this->end = end;
-  distance = 0;
-  time = 0;
-  timeInstance = 0;
-}
-
-Arc::Arc(unsigned int start, unsigned int end, unsigned int distance, unsigned int time, unsigned int  timeInstance) {
-  this->start = start ;
-  this->end = end;
+Arc::Arc(const Node &start, const Node &end, unsigned int distance, unsigned int time) {
+  this->start = &start;
+  this->end = &end;
   this->distance = distance;
   this->time = time;
-  this->timeInstance = timeInstance;
 }
 
-bool Arc::operator< (const Arc& a) const {
-  return (start < a.start) || (start == a.start && end < a.end) || (start == a.start && end == a.end && timeInstance < a.timeInstance);
+bool Arc::operator<(const Arc &a) const {
+  return (*start < *a.start || *start == *a.start && *end < *a.end);
 }
 
 unsigned int Arc::getStart() const {
-  return start;
+  return start->getIndex();
 }
 
 unsigned int Arc::getEnd() const {
-  return end;
+  return end->getIndex();
 }
 
 unsigned int Arc::getDistance() const {
@@ -52,9 +43,9 @@ unsigned int Arc::getTime() const {
   return time;
 }
 unsigned int Arc::getTimeInstance() const {
-  return timeInstance;
+  return start->getTimeInstance();
 }
-
-void Arc::setDistance(unsigned int distance) {
-  this->distance = distance;
+void Arc::print() const {
+  std::cout << "A{" << start->toString() << " => " << end->toString() << "; ["
+            << getDistance() << ", " << getTime() << "]}" << std::endl;
 }
