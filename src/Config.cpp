@@ -32,7 +32,7 @@ public:
   void generateTimeWindows();
   void generateTimeDependency(unsigned int variation);
   void print();
-  unsigned int getVertexCount();
+  unsigned int getVertexCount() const;
   vector<vector<unsigned int>> getDistances();
   vector<vector<unsigned int>> getTimes();
   vector<vector<unsigned int>> getWindows();
@@ -43,7 +43,7 @@ Config::Config() {
   index = 0;
 }
 
-Config::Config(unsigned int index) {
+Config::Config(const unsigned int index) {
   this->index = index;
 }
 
@@ -168,7 +168,8 @@ void Config::printTimeWindowsAverage() {
     sum += windows[i][1];
     sum -= windows[i][0];
   }
-  cout << "Suma okien = " << sum << " Srednia = " << (double) sum / vertexCount << endl;
+  cout << "Suma okien = " << sum << " Srednia = "
+       << (double) sum / vertexCount << endl;
 }
 
 void Config::print() {
@@ -183,7 +184,7 @@ void Config::print() {
   printVector(timeDependency);
 }
 
-unsigned int Config::getVertexCount() {
+unsigned int Config::getVertexCount() const {
   return vertexCount;
 }
 

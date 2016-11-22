@@ -7,6 +7,8 @@
 #include <vector>
 #include <algorithm>
 #include "Config.cpp"
+#include "Route.cpp"
+#include "BranchAndBound.cpp"
 
 using std::string;
 using std::vector;
@@ -21,7 +23,7 @@ using std::shared_ptr;
 
 class GraphTransformation {
  private:
-  const unsigned int DEPOT_INDEX = -1;
+  unsigned int DEPOT_INDEX = config->getVertexCount();
   shared_ptr<Config> config;
   unique_ptr<Graph> graph;
   set<Node> nodes;
@@ -82,8 +84,10 @@ void GraphTransformation::loadArcs() {
     for (vj = nodes.begin(); vj != nodes.end(); ++vj) {
       j = vj->getIndex();
       if (i != j) {
-        travel = config->getTimes()[i][j] * config->getTimeDependency()[min(k, max_time)/60] / 1000;
-        if (vj->getTimeInstance() == max(config->getWindows()[j][0], k + travel)) {
+        travel = config->getTimes()[i][j]
+                 * config->getTimeDependency()[min(k, max_time)/60] / 1000;
+        if (vj->getTimeInstance() == max(
+          config->getWindows()[j][0], k + travel)) {
           graph->addArc(*vi, *vj, config->getDistances()[i][j], travel);
         }
       }
@@ -100,15 +104,17 @@ void GraphTransformation::connectDepot() {
   i = config->getWindows()[0][0];
   p0 = config->getWindows()[0][1];
   
-  graph->addNode(DEPOT_INDEX, i, p0, 0);
+  graph->addNode(DEPOT_INDEX, 0, i, p0);
   for (; i <= p0; ++i) {
     j = 0;
     for (it = arcs.begin(); it != arcs.end(); ++it) {
-      if (!(j & 1) && (it->getStart() == 0) && (it->getTimeInstance() == i)) { // wychodzący
+      // wychodzący
+      if (!(j&1) && it->getStart() == 0 && it->getTimeInstance() == i) {
         j = j|1;
         graph->addArc(DEPOT_INDEX, 0, 0, 0);
       }
-      if (!(j & 2) && (it->getEnd() == 0) && (it->getTimeInstance() == i)) { // wchodzący
+      // wchodzący
+      if (!(j&2) && it->getEnd() == 0 && it->getTimeInstance() == i) {
         j = j|2;
         graph->addArc(0, DEPOT_INDEX, 0, 0);
       }
@@ -146,7 +152,8 @@ void GraphTransformation::secondAuxiliaryGraph() {
 
   for (ait = arcs.begin(); ait != arcs.end(); ++ait)
     if (ait->getEnd() == 0)
-      graph->addArc(ait->getStart(), DEPOT_INDEX, ait->getDistance(), ait->getTime());
+      graph->addArc(ait->getStart(), DEPOT_INDEX, ait->getDistance(),
+                    ait->getTime());
   
   // removing left arcs
   removeArcsOfNode(0);
@@ -165,7 +172,8 @@ void GraphTransformation::secondAuxiliaryGraph() {
         ++plus;
         out = ait->getEnd();
       }
-      if (ait->getEnd() == index  &&  (ait->getTime() + ait->getTimeInstance() == timeInstance)) {
+      if (ait->getEnd() == index
+          && ait->getTime()+ait->getTimeInstance() == timeInstance) {
         ++minus;
         in = ait->getStart();
       }
@@ -203,9 +211,11 @@ void GraphTransformation::removeArcsOfNode(unsigned int index) {
   }
 }
 
-void GraphTransformation::removeArcsOfNode(unsigned int index, unsigned int timeInstance) {
+void GraphTransformation::removeArcsOfNode(unsigned int index,
+                                           unsigned int timeInstance) {
   for (set<Arc>::iterator it = arcs.begin(); it != arcs.end();) {
-    if (it->getTimeInstance() == timeInstance && (it->getStart() == index || it->getEnd() == index))
+    if (it->getTimeInstance() == timeInstance
+        && (it->getStart() == index || it->getEnd() == index))
       it = arcs.erase(it);
     else
       ++it;

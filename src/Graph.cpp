@@ -2,8 +2,6 @@
 #include "Arc.cpp"
 
 using std::set;
-using std::cout;
-using std::endl;
 
 class Graph {
  private:
@@ -15,9 +13,6 @@ class Graph {
                const unsigned int open = 0, const unsigned int close = 0);
   void addArc(const Node &start, const Node &end,
               const unsigned int distance = 0, const unsigned int time = 0);
-  // void addArc(const unsigned int start, const unsigned int end,
-  //             const unsigned int timeInstance = 0,
-  //             const unsigned int distance = 0, const unsigned int time = 0);
   unsigned int getNodesCount() const;
   unsigned int getArcsCount() const;
   set<Node> getNodes();
@@ -25,8 +20,8 @@ class Graph {
   void removeNode(const unsigned int index,
                   const unsigned int timeInstance = 0);
   void removeArc(const Node &start, const Node &end);
-  void printNodes();
-  void printArcs();
+  void printNodes() const;
+  void printArcs() const;
 };
 
 void Graph::addNode(const Node &node) {
@@ -85,15 +80,15 @@ void Graph::removeArc(const Node &start, const Node &end) {
     arcs.erase(it);
 }
 
-void Graph::printNodes() {
-  cout << "\tNodes(" << nodes.size() << "):" << endl;
+void Graph::printNodes() const {
+  std::cout << "\tNodes(" << nodes.size() << "):" << std::endl;
   for (std::set<Node>::iterator nit = nodes.begin(); nit!= nodes.end(); ++nit) {
     nit->print();
   }
 }
 
-void Graph::printArcs() {
-  cout << "\tArcs(" << arcs.size() << "):" << endl;
+void Graph::printArcs() const {
+  std::cout << "\tArcs(" << arcs.size() << "):" << std::endl;
   for (std::set<Arc>::iterator aIt = arcs.begin(); aIt != arcs.end(); ++aIt) {
     aIt->print();
   }

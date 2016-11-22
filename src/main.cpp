@@ -16,7 +16,7 @@ void doGraphTransformation(unsigned int index);
 
 int main (int argc, char **argv) {
   runTests();
-  doGraphTransformation(0);
+  // doGraphTransformation(0);
 
   cout << "END" << endl;
   return 0;
@@ -108,7 +108,8 @@ void TestGraph() {
   assert(graph->getNodesCount() == 2);
   assert(graph->getArcsCount() == 1);
 
-  graph->removeArc(*node1, *node2b); // should not remove A(1, 0) => (2, 0)
+  // should not remove A(1, 0) => (2, 0)
+  graph->removeArc(*node1, *node2b);
   assert(graph->getArcsCount() == 1);
 
   graph->removeArc(*node1, *node2); // should remove

@@ -1,31 +1,32 @@
+#include <vector>
+
+using std::vector;
+
 class Route {
-private:
+ private:
   unsigned int k;
   long cost;
   unsigned int totalDistance;
   unsigned int travelTime;
   unsigned int startingDelay;
-  unsigned int missedVertexes;
+  unsigned int leftVertexes;
   vector<unsigned int> sequence;
-public:
-  Route(int a = 0);
-  Route(Route *r);
-}
+ public:
+  Route(unsigned int a = 0);
+  Route(Route &r);
+};
 
-Route::Route(int a = 0) {
-  n = a;
+Route::Route(unsigned int a) {
   cost = 0L;
-  k = distance = travelTime = workHours = delay = missed = 0;
+  k = totalDistance = travelTime = startingDelay = leftVertexes = 0;
 }
 
-Route::Route(Route r) {
-  n = r.n;
+Route::Route(Route &r) {
   k = r.k;
   cost = r.cost;
-  distance = r.distance;
+  totalDistance = r.totalDistance;
   travelTime = r.travelTime;
-  workHours = r.workHours;
-  delay = r.delay;
-  missed = r.missed;
-  //TODO copy sequence
+  startingDelay = r.startingDelay;
+  leftVertexes = r.leftVertexes;
+  sequence = r.sequence;
 }
