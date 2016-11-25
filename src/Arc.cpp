@@ -1,6 +1,3 @@
-#include <sstream>
-#include "Node.cpp"
-
 class Arc {
  private:
   const Node *start;

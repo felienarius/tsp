@@ -1,75 +1,46 @@
-#include <queue>
-#include <vector>
-#include "Graph.cpp"
-
 using std::vector;
 
-struct BBNode {
-  unsigned int cost;
-  unsigned int traveledTime;
-  unsigned int visited;
-  unsigned int k;
-  vector<unsigned int> seq;
-  vector<unsigned int> kids;
-  BBNode() {
-    cost = traveledTime = visited = k = 0;
-  }
-};
-class CompareBBNodes {
+class CompareRoutes {
  public:
-  bool operator()(const BBNode &node1, const BBNode &node2) {
-    //kolejność - rosnąco
-    if (node1.visited < node2.visited) return true;
-    
-    if (node1.cost < node2.cost) return true;
-    if (node1.cost > node2.cost) return false;
-
-    if (node1.traveledTime < node2.traveledTime) return true;
-    if (node1.traveledTime > node2.traveledTime) return false;
-
-    return false;
-  }
+  
 };
 class BranchAndBound {
-  priority_queue<BBNode, vector<BBNode>, CompareBBNodes> pq;
-  vector<int> best_set;
-  int best;
-  int upperbound;
-  int lowerbound;
-  void propagate(BBNode n);
-  int value(BBNode n);
-  int bound(BBNode n, int next);
+  std::priority_queue<Route, vector<Route>, std::less<Route>> pq;
+  vector<unsigned int> best_set;
+  unsigned int best;
+  unsigned int upperbound;
+  unsigned int lowerbound;
+  void propagate(Route n);
+  unsigned int value(Route n);
+  unsigned int bound(Route n, int next);
 public:
   BranchAndBound(Graph *graph) {
-    g = graph;
     best = upperbound = lowerbound = -1;
   }
-  void printBBN(BBNode n);
   void work();
 };
 
 /* PRIVATE */
-void BranchAndBound::propagate(BBNode n) {
+void BranchAndBound::propagate(Route r) {
   int i, count;
-  vector<int> v;
+  vector<unsigned int>::iterator it;
 
-  count = n.kids.size();
-  for (i = 0; i < count; ++i) {
-    BBNode bbn = BBNode();
+  for (it = r.leftVertexes.begin(); i < count; ++i) {
+    Route bbn = Route();
     v = n.seq;
     v.push_back(n.kids[i]);
     bbn.seq = v;
     bbn.traveledTime = g->calcTraveledTime(v);
   }
 }
-int BranchAndBound::value(const BBNode n) {
-  return n.cost;
+int BranchAndBound::value(const Route r) {
+  return r.cost;
 }
-int BranchAndBound::bound(BBNode n, int next) {
+int BranchAndBound::bound(Route n, int next) {
   return 0;
 }
 /* PUBLIC */
-void BranchAndBound::printBBN(BBNode n) {
+void BranchAndBound::printBBN(Route n) {
   vector<int>::iterator it;
 
   cout << "cost = " << n.cost << " tt = " << n.traveledTime
@@ -90,7 +61,7 @@ void BranchAndBound::printBBN(BBNode n) {
   }
 }
 void BranchAndBound::work() {
-  BBNode n;
+  Route n;
   unsigned int pls = 1;
   while(!pq.empty() && pls) {
     n = pq.top();
@@ -108,7 +79,7 @@ void BranchAndBound::work() {
 }
 
 
-// void addBBNode(PriorityQueue &pq, int cost, int travelTime, vector<int> seq, vector<int> kids) {
+// void addRoute(PriorityQueue &pq, int cost, int travelTime, vector<int> seq, vector<int> kids) {
 //  bb.cost = cost;
 //  bb.travelTime = travelTime;
 //  bb.seq = seq;

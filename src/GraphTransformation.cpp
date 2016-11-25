@@ -1,16 +1,3 @@
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include "Config.cpp"
-#include "Route.cpp"
-#include "BranchAndBound.cpp"
-
-using std::string;
 using std::vector;
 using std::set;
 using std::max;
@@ -38,6 +25,7 @@ class GraphTransformation {
   void load(shared_ptr<Config> config);
   void firstAuxiliaryGraph();
   void secondAuxiliaryGraph();
+  void runBranchAndBound();
 };
 
 GraphTransformation::GraphTransformation() {
@@ -198,8 +186,10 @@ void GraphTransformation::secondAuxiliaryGraph() {
       }
     }
   }
-  // graph->printNodes();
-  // graph->printArcs();
+}
+
+void GraphTransformation::runBranchAndBound() {
+  
 }
 
 void GraphTransformation::removeArcsOfNode(unsigned int index) {

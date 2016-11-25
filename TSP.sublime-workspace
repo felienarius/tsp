@@ -327,7 +327,7 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 3129,
+				"buffer_size": 3134,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -336,7 +336,7 @@
 			"file": "src/Arc.cpp",
 			"settings":
 			{
-				"buffer_size": 1273,
+				"buffer_size": 1442,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -345,7 +345,7 @@
 			"file": "src/Graph.cpp",
 			"settings":
 			{
-				"buffer_size": 2829,
+				"buffer_size": 2638,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -363,7 +363,7 @@
 			"file": "src/GraphTransformation.cpp",
 			"settings":
 			{
-				"buffer_size": 6231,
+				"buffer_size": 6401,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -372,7 +372,7 @@
 			"file": "src/Config.cpp",
 			"settings":
 			{
-				"buffer_size": 4909,
+				"buffer_size": 4934,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -477,7 +477,7 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "packa",
+		"last_filter": "",
 		"selected_items":
 		[
 			[
@@ -513,7 +513,7 @@
 				"Install Package Control"
 			]
 		],
-		"width": 485.0
+		"width": 432.0
 	},
 	"console":
 	{
@@ -739,7 +739,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3129,
+						"buffer_size": 3134,
 						"regions":
 						{
 						},
@@ -769,7 +769,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1273,
+						"buffer_size": 1442,
 						"regions":
 						{
 						},
@@ -803,7 +803,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2829,
+						"buffer_size": 2638,
 						"regions":
 						{
 						},
@@ -872,15 +872,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6231,
+						"buffer_size": 6401,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2505,
-								2505
+								2470,
+								2470
 							]
 						],
 						"settings":
@@ -902,7 +902,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4909,
+						"buffer_size": 4934,
 						"regions":
 						{
 						},
@@ -1035,8 +1035,8 @@
 						"selection":
 						[
 							[
-								329,
-								329
+								224,
+								224
 							]
 						],
 						"settings":

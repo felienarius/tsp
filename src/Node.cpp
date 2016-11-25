@@ -1,5 +1,3 @@
-#include <sstream>
-
 class Node {
  private:
   unsigned int index;
@@ -9,8 +7,8 @@ class Node {
  public:
   Node(const unsigned int index, const unsigned int timeInstance = 0,
        const unsigned int open = 0, const unsigned int close = 0);
-  bool operator<(const Node& n) const;
-  bool operator==(const Node& n) const;
+  bool operator<(const Node &n) const;
+  bool operator==(const Node &n) const;
   unsigned int getIndex() const;
   unsigned int getOpen() const;
   unsigned int getClose() const;
@@ -27,11 +25,11 @@ Node::Node(const unsigned int index, const unsigned int timeInstance,
   this->close = close;
 }
 
-bool Node::operator<(const Node& n) const {
+bool Node::operator<(const Node &n) const {
   return (index < n.index || index == n.index && timeInstance < n.timeInstance);
 }
 
-bool Node::operator==(const Node& n) const {
+bool Node::operator==(const Node &n) const {
   return (index == n.index && timeInstance == n.timeInstance);
 }
 

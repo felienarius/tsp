@@ -1,6 +1,3 @@
-#include <set>
-#include "Arc.cpp"
-
 using std::set;
 
 class Graph {

@@ -1,5 +1,3 @@
-#include "Graph.cpp"
-
 using std::ifstream;
 using std::string;
 using std::vector;
