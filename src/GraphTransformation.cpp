@@ -1,39 +1,17 @@
-using std::vector;
-using std::set;
-using std::max;
-using std::min;
+#include "GraphTransformation.h"
 
-using std::cout;
-using std::endl;
-using std::unique_ptr;
-using std::shared_ptr;
-
-class GraphTransformation {
- private:
-  unsigned int DEPOT_INDEX = config->getVertexCount();
-  shared_ptr<Config> config;
-  unique_ptr<Graph> graph;
-  set<Node> nodes;
-  set<Arc> arcs;
-  void loadNodes();
-  void loadArcs();
-  void connectDepot();
-  void removeArcsOfNode(unsigned int index);
-  void removeArcsOfNode(unsigned int index, unsigned int timeInstance);
- public:
-  GraphTransformation();
-  void load(shared_ptr<Config> config);
-  void firstAuxiliaryGraph();
-  void secondAuxiliaryGraph();
-  void runBranchAndBound();
-};
+GraphTransformation::GraphTransformation(shared_ptr<Config> config) {
+  graph.reset(new Graph());
+  this->config = config;
+  DEPOT_INDEX = config->getVertexCount();
+}
 
 GraphTransformation::GraphTransformation() {
   graph.reset(new Graph());
-}
-
-void GraphTransformation::load(shared_ptr<Config> config) {
-  this->config = config;
+  graph->getTestGraph();
+  config.reset(new Config());
+  config->getTestConfig();
+  DEPOT_INDEX = 4;
 }
 
 void GraphTransformation::firstAuxiliaryGraph() {
@@ -156,12 +134,12 @@ void GraphTransformation::secondAuxiliaryGraph() {
     index = nit->getIndex();
     timeInstance = nit->getTimeInstance();
     for (ait = arcs.begin(); ait != arcs.end(); ++ait) {
-      if (ait->getStart() == index  &&  ait->getTimeInstance() == timeInstance){
+      if (ait->getStart() == index && ait->getTimeInstance() == timeInstance) {
         ++plus;
         out = ait->getEnd();
       }
       if (ait->getEnd() == index
-          && ait->getTime()+ait->getTimeInstance() == timeInstance) {
+          && ait->getTime() + ait->getTimeInstance() == timeInstance) {
         ++minus;
         in = ait->getStart();
       }
@@ -189,7 +167,7 @@ void GraphTransformation::secondAuxiliaryGraph() {
 }
 
 void GraphTransformation::runBranchAndBound() {
-  
+  // BranchAndBound bb = BranchAndBound(Route(config->getVertexCount()));
 }
 
 void GraphTransformation::removeArcsOfNode(unsigned int index) {
@@ -210,4 +188,8 @@ void GraphTransformation::removeArcsOfNode(unsigned int index,
     else
       ++it;
   }
+}
+
+void GraphTransformation::print() const {
+  graph->printArcs();
 }

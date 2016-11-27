@@ -1,58 +1,37 @@
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-#include <assert.h>
-#include <ctime>
-#include <fstream>
-#include <stdio.h>
-#include <string>
-#include <vector>
-#include <set>
-#include <algorithm>
-#include <sstream>
-#include <queue>
-#include "Node.cpp"
-#include "Arc.cpp"
-#include "Graph.cpp"
-#include "Config.cpp"
-#include "Route.cpp"
-#include "BranchAndBound.cpp"
-#include "GraphTransformation.cpp"
-
-using std::cout;
-using std::endl;
-using std::unique_ptr;
-using std::shared_ptr;
-
-void TestNode();
-void TestArc();
-void TestGraph();
-void runTests();
-void doGraphTransformation(unsigned int index);
+#include "main.h"
 
 int main (int argc, char **argv) {
   runTests();
-  // doGraphTransformation(0);
+  // doGraphTransformation(100);
 
   cout << "END" << endl;
   return 0;
 }
 
+
 void doGraphTransformation(unsigned int index) {
-  shared_ptr<Config> conf(new Config(index));
-  conf->loadATSP();
-  conf->generateTravelTimes();
-  conf->generateTimeWindows();
-  conf->generateTimeDependency();
-  unique_ptr<GraphTransformation> gt(new GraphTransformation());
-  gt->load(conf);
-  gt->firstAuxiliaryGraph();
-  gt->secondAuxiliaryGraph();
+  unique_ptr<GraphTransformation> gt;
+  shared_ptr<Config> conf;
+    
+  if (index == 100) {
+    gt.reset(new GraphTransformation());
+  } else {
+    conf.reset(new Config(index));
+    conf->loadATSP();
+    conf->generateTravelTimes();
+    conf->generateTimeWindows();
+    conf->generateTimeDependency();
+    gt.reset(new GraphTransformation(conf));
+    gt->firstAuxiliaryGraph();
+  }
+  gt->print();
+  // gt->secondAuxiliaryGraph();
+  // gt->print();
 }
 
 void runTests() {
   TestNode();
-  TestArc();
+  // TestArc();
   TestGraph();
   unique_ptr<Config> c(new Config());
   c->loadATSP();
@@ -63,28 +42,45 @@ void runTests() {
 }
 
 void TestNode() {
-  unique_ptr<Node> node(new Node(1, 2, 3, 4));
-  unique_ptr<Node> node2(new Node(1, 2));
-  unique_ptr<Node> node3(new Node(1, 5));
-  assert(node != NULL);
-  assert(node2 != NULL);
-  assert(node->getIndex() == 1);
-  assert(node->getTimeInstance() == 2);
-  assert(node->getOpen() == 3);
-  assert(node->getClose() == 4);
-  assert(*node == *node2);
-  assert(*node < *node3);
-  assert(*node2 < *node3);
+  unique_ptr<Node> n1(new Node(1, 2, 3, 4));
+  unique_ptr<Node> n2(new Node(1, 2));
+  unique_ptr<Node> n3(new Node(1, 5));
+  assert(n1 != NULL);
+  assert(n2 != NULL);
+  assert(n1->getIndex() == 1);
+  assert(n1->getTimeInstance() == 2);
+  assert(n1->getOpen() == 3);
+  assert(n1->getClose() == 4);
+  assert(*n1 == *n2);
+  assert(*n1 < *n3);
+  assert(*n2 < *n3);
 }
 
 void TestArc() {
-  unique_ptr<Node> node1(new Node(1));
-  unique_ptr<Node> node2(new Node(2));
-  unique_ptr<Arc> arc(new Arc(*node2, *node1));
-  assert(arc != NULL);
-  assert(arc->getDistance() == 0);
-  assert(arc->getStart() == 2);
-  assert(arc->getEnd() == 1);
+  cout << "TestArc";
+  unique_ptr<Node> n1(new Node(1, 5));
+  unique_ptr<Node> n2(new Node(2));
+  // unique_ptr<Node> n3(new Node(2));
+  // unique_ptr<Node> n4(new Node(2));
+  // unique_ptr<Node> n5(new Node(2));
+
+  unique_ptr<Arc> a21(new Arc(*n2, *n1));
+  unique_ptr<Arc> a12(new Arc(*n1, *n2));
+  
+  assert(a21 != NULL);
+  assert(a12 != NULL);
+  assert(a12->getStart() == 1);
+  assert(a12->getTimeInstance() == 5);
+  assert(a12->getEnd() == 2);
+  assert(a12->getTime() == 0);
+  assert(a12->getDistance() == 0);
+  n1->print();
+  n2->print();
+  cout << n2->toString() << "\n";
+  a12->print();
+  a21->print();
+  cout << "123";
+  // assert(1 == 2);
 }
 
 void TestGraph() {

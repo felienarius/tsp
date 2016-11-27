@@ -35,6 +35,7 @@ public:
   vector<vector<unsigned int>> getTimes();
   vector<vector<unsigned int>> getWindows();
   vector<unsigned int> getTimeDependency();
+  void getTestConfig();
 };
 
 Config::Config() {
@@ -51,7 +52,6 @@ void Config::loadATSP() {
   unsigned int i, j, value;
 
   name = pliki[index];
-  // cout << "Loading " << name << ".atsp" << endl;
   plik.open((string("../atsp/") + name + string(".atsp")).c_str());
   if (!plik.good()) return;
 
@@ -200,4 +200,25 @@ vector<vector<unsigned int>> Config::getWindows() {
 
 vector<unsigned int> Config::getTimeDependency() {
   return timeDependency;
+}
+
+void Config::getTestConfig() {
+  vertexCount = 4;
+
+  windows.resize(vertexCount);
+  windows[0].resize(2);
+  windows[0][0] = 1;
+  windows[0][1] = 7;
+
+  windows[1].resize(2);
+  windows[1][0] = 2;
+  windows[1][1] = 4;
+
+  windows[2].resize(2);
+  windows[2][0] = 2;
+  windows[2][1] = 3;
+
+  windows[3].resize(2);
+  windows[3][0] = 4;
+  windows[3][1] = 6;
 }

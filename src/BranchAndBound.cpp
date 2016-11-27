@@ -1,83 +1,53 @@
 using std::vector;
 
-class CompareRoutes {
- public:
-  
-};
 class BranchAndBound {
+ private:
   std::priority_queue<Route, vector<Route>, std::less<Route>> pq;
-  vector<unsigned int> best_set;
-  unsigned int best;
+  std::unique_ptr<Route> best;
   unsigned int upperbound;
   unsigned int lowerbound;
-  void propagate(Route n);
-  unsigned int value(Route n);
-  unsigned int bound(Route n, int next);
+  void propagate(const Route r);
+  const unsigned int value(const Route r) const;
+  unsigned int bound(Route r, int next);
 public:
-  BranchAndBound(Graph *graph) {
-    best = upperbound = lowerbound = -1;
-  }
+  BranchAndBound(const Route &r);
   void work();
 };
 
-/* PRIVATE */
-void BranchAndBound::propagate(Route r) {
+BranchAndBound::BranchAndBound(const Route &r) {
+  upperbound = lowerbound = -1;
+}
+
+void BranchAndBound::propagate(const Route r) {
   int i, count;
-  vector<unsigned int>::iterator it;
+  vector<unsigned int>::iterator it = r.getLeftVertexes().begin();
 
-  for (it = r.leftVertexes.begin(); i < count; ++i) {
-    Route bbn = Route();
-    v = n.seq;
-    v.push_back(n.kids[i]);
-    bbn.seq = v;
-    bbn.traveledTime = g->calcTraveledTime(v);
+  for (; it != r.getLeftVertexes().end(); ++it) {
+    Route route = Route(r);
+    route.addVertex(*it);
+    // bbn.traveledTime = g->calcTraveledTime(v);
   }
 }
-int BranchAndBound::value(const Route r) {
-  return r.cost;
-}
-int BranchAndBound::bound(Route n, int next) {
-  return 0;
-}
-/* PUBLIC */
-void BranchAndBound::printBBN(Route n) {
-  vector<int>::iterator it;
 
-  cout << "cost = " << n.cost << " tt = " << n.traveledTime
-            << "visited = " << n.visited << endl;
-  if(!n.seq.empty()) {
-    std::cout << "seq[";
-    for (it = n.seq.begin(); it != n.seq.end(); ++it) {
-      std::cout << " " << *it; 
-    }
-    std::cout << " ]\n";
-  }
-  if(!n.kids.empty()) {
-    std::cout << "kid[";
-    for (it = n.kids.begin(); it != n.kids.end(); ++it) {
-      std::cout << " " << *it; 
-    }
-    std::cout << " ]\n";
-  }
+const unsigned int BranchAndBound::value(const Route r) const {
+  return r.getCost();
 }
+
 void BranchAndBound::work() {
-  Route n;
   unsigned int pls = 1;
   while(!pq.empty() && pls) {
-    n = pq.top();
+    std::unique_ptr<Route> r(new Route(pq.top()));
     pq.pop();
-    if (n.visited == g->getN()) {
-      if (value(n) < best) {
-        best = value(n);
-        best_set = n.seq;
+    if (r->isFinished()) {
+      if (value(*r) < best->getCost()) {
+        best = std::move(r);
       }
     } else {
-      propagate(n);
+      propagate(*r);
       --pls;
     }
   }
 }
-
 
 // void addRoute(PriorityQueue &pq, int cost, int travelTime, vector<int> seq, vector<int> kids) {
 //  bb.cost = cost;

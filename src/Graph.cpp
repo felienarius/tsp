@@ -17,8 +17,10 @@ class Graph {
   void removeNode(const unsigned int index,
                   const unsigned int timeInstance = 0);
   void removeArc(const Node &start, const Node &end);
+  void getTestGraph();
   void printNodes() const;
   void printArcs() const;
+  void print() const;
 };
 
 void Graph::addNode(const Node &node) {
@@ -77,6 +79,100 @@ void Graph::removeArc(const Node &start, const Node &end) {
     arcs.erase(it);
 }
 
+void Graph::getTestGraph() {
+  unsigned int start, end;
+  set<Node>::iterator n1, n2;
+
+  start = 1, end = 7;
+  for (unsigned int i = start; i <= end; ++i)
+    addNode(0, i, start, end);
+  start = 2, end = 4;
+  for (unsigned int i = start; i <= end; ++i)
+    addNode(1, i, start, end);
+  start = 2, end = 3;
+  for (unsigned int i = start; i <= end; ++i)
+    addNode(2, i, start, end);
+  start = 4, end = 6;
+  for (unsigned int i = start; i <= end; ++i)
+    addNode(3, i, start, end);
+  //V0
+  n1 = nodes.find(Node(0, 1));
+  n2 = nodes.find(Node(1, 3));
+  addArc(*n1, *n2, 2, 82);
+  n2 = nodes.find(Node(2, 2));
+  addArc(*n1, *n2, 1, 42);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 3, 115);
+
+  n1 = nodes.find(Node(0, 2));
+  n2 = nodes.find(Node(1, 3));
+  addArc(*n1, *n2, 1, 42);
+  n2 = nodes.find(Node(2, 3));
+  addArc(*n1, *n2, 1, 39);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 2, 78);
+
+  n1 = nodes.find(Node(0, 3));
+  n2 = nodes.find(Node(1, 4));
+  addArc(*n1, *n2, 1, 42);
+  n2 = nodes.find(Node(3, 5));
+  addArc(*n1, *n2, 2, 77);
+  
+  n1 = nodes.find(Node(0, 4));
+  addArc(*n1, *n2, 1, 40);
+
+  n1 = nodes.find(Node(0, 5));
+  n2 = nodes.find(Node(3, 6));
+  addArc(*n1, *n2, 1, 41);
+  
+  //V1
+  n1 = nodes.find(Node(1, 2));
+  n2 = nodes.find(Node(0, 3));
+  addArc(*n1, *n2, 1, 41);
+  n2 = nodes.find(Node(2, 3));
+  addArc(*n1, *n2, 1, 40);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 2, 79);
+
+  n1 = nodes.find(Node(1, 3));
+  n2 = nodes.find(Node(0, 4));
+  addArc(*n1, *n2, 1, 40);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 1, 40);
+
+  n1 = nodes.find(Node(1, 4));
+  n2 = nodes.find(Node(0, 5));
+  addArc(*n1, *n2, 1, 42);
+  n2 = nodes.find(Node(3, 5));
+  addArc(*n1, *n2, 1, 39);
+
+  //V2
+  n1 = nodes.find(Node(2, 2));
+  n2 = nodes.find(Node(0, 3));
+  addArc(*n1, *n2, 1, 41);
+  n2 = nodes.find(Node(1, 3));
+  addArc(*n1, *n2, 1, 41);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 2, 83);
+
+  n1 = nodes.find(Node(2, 3));
+  n2 = nodes.find(Node(0, 4));
+  addArc(*n1, *n2, 1, 40);
+  n2 = nodes.find(Node(1, 4));
+  addArc(*n1, *n2, 1, 38);
+  n2 = nodes.find(Node(3, 4));
+  addArc(*n1, *n2, 1, 42);
+
+  //V3
+  n1 = nodes.find(Node(3, 4));
+  n2 = nodes.find(Node(0, 5));
+  addArc(*n1, *n2, 1, 42);
+  
+  n1 = nodes.find(Node(3, 5));
+  n2 = nodes.find(Node(0, 6));
+  addArc(*n1, *n2, 1, 41);
+}
+
 void Graph::printNodes() const {
   std::cout << "\tNodes(" << nodes.size() << "):" << std::endl;
   for (std::set<Node>::iterator nit = nodes.begin(); nit!= nodes.end(); ++nit) {
@@ -89,4 +185,10 @@ void Graph::printArcs() const {
   for (std::set<Arc>::iterator aIt = arcs.begin(); aIt != arcs.end(); ++aIt) {
     aIt->print();
   }
+}
+
+void Graph::print() const {
+  std::cout << "\tGraph:\n";
+  printNodes();
+  printArcs();
 }
